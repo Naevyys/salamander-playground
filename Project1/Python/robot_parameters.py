@@ -44,27 +44,40 @@ class RobotParameters(dict):
 
     def set_frequencies(self, parameters):
         """Set frequencies"""
-        #pylog.warning('Coupling weights must be set')
-        self.f_i = parameters.f_i
+        assert parameters.freqs.shape[0] == self.n_oscillators, \
+            "Length of frequencies does not match number of oscillators!"
+        self.freqs = parameters.freqs
 
     def set_coupling_weights(self, parameters):
         """Set coupling weights"""
-        #pylog.warning('Coupling weights must be set')
-        self.w_ij = parameters.w_ij
+        assert parameters.coupling_weights.shape[0] == self.n_oscillators and \
+            parameters.coupling_weights.shape[1] == self.n_oscillators, \
+            "Shape of coupling weights does not match the number of oscillators!"
+        self.coupling_weights = parameters.coupling_weights
 
     def set_phase_bias(self, parameters):
         """Set phase bias"""
-        #pylog.warning('Phase bias must be set')
+        assert parameters.phase_bias.shape[0] == self.n_oscillators and \
+               parameters.phase_bias.shape[1] == self.n_oscillators, \
+               "Shape of phase bias does not match the number of oscillators!"
+
+        self.phase_bias = parameters.phase_bias
 
     def set_amplitudes_rate(self, parameters):
         """Set amplitude rates"""
-        pylog.warning('Convergence rates must be set')
+        assert parameters.rates.shape[0] == self.n_oscillators, \
+            "Length of amplitude rates does not match the number of oscillators!"
+        self.rates = parameters.rates
 
     def set_nominal_amplitudes(self, parameters):
         """Set nominal amplitudes"""
-        pylog.warning('Nominal amplitudes must be set')
+        assert parameters.nominal_amplitudes.shape[0] == self.n_oscillators, \
+            "Length of nominal amplitudes does not match the number of oscillators!"
+        self.nominal_amplitudes = parameters.nominal_amplitudes
 
     def set_feedback_gains(self, parameters):
         """Set feeback gains"""
-        pylog.warning('Convergence rates must be set')
+        assert parameters.feedback_gain.shape[0] == self.n_oscillators, \
+            "Length of feedback gain does not match the number of oscillators!"
+        self.feedback_gains = parameters.feedback_gain
 
