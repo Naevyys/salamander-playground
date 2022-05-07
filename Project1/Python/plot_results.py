@@ -45,7 +45,7 @@ def plot_1d(results, labels):
     plt.grid(True)
 
 
-def plot_2d(results, labels, n_data=300, log=False, cmap=None):
+def plot_2d(results, labels, n_data=300, log=False, cmap=None, plot=True):
     """Plot result
 
     results - The results are given as a 2d array of dimensions [N, 3].
@@ -90,11 +90,11 @@ def plot_2d(results, labels, n_data=300, log=False, cmap=None):
     cbar.set_label(labels[2])
 
 
-def main(plot=True):
+def main(directory='logs/example', sim_number='0', suffix="", plot=True):
     """Main"""
     # Load data
-    data = SalamandraData.from_file('logs/example/simulation_0.h5')
-    with open('logs/example/simulation_0.pickle', 'rb') as param_file:
+    data = SalamandraData.from_file('{}/simulation_{}{}.h5'.format(directory, sim_number, suffix))
+    with open('{}/simulation_{}.pickle'.format(directory, sim_number), 'rb') as param_file:
         parameters = pickle.load(param_file)
     timestep = data.timestep
     n_iterations = np.shape(data.sensors.links.array)[0]
