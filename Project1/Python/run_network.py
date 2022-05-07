@@ -11,7 +11,7 @@ from simulation_parameters import SimulationParameters
 from network import SalamandraNetwork
 
 
-def run_network(duration, update=False, drive=0):
+def run_network(duration, update=True, drive=0):
     """Run network without MuJoCo and plot results
     Parameters
     ----------
@@ -22,9 +22,15 @@ def run_network(duration, update=False, drive=0):
     drive: <float/array>
         Central drive to the oscillators
     """
+
+    drive=0.5
+    update=True
+    duration=40
+
     # Simulation setup
     timestep = 1e-2
     times = np.arange(0, duration, timestep)
+    drivedt=(5/40)*times+0.5
     n_iterations = len(times)
     sim_parameters = SimulationParameters(
         drive=drive,
@@ -54,9 +60,23 @@ def run_network(duration, update=False, drive=0):
         len(network.robot_parameters.freqs)
     ])
     freqs_log[0, :] = network.robot_parameters.freqs
+    nomamp_log = np.zeros([
+        n_iterations,
+        len(network.robot_parameters.nominal_amplitudes)
+    ])
+    nomamp_log[0, :] = network.robot_parameters.nominal_amplitudes
+
+    instfreq_log = np.zeros([
+        n_iterations,
+        len(network.state.amplitudes(iteration=0))
+    ])
+    instfreq_log[0, :] = network.get_inst_freq(iteration=0)
+
+
     outputs_log = np.zeros([
         n_iterations,
         len(network.get_motor_position_output(iteration=0))
+
     ])
     outputs_log[0, :] = network.get_motor_position_output(iteration=0)
 
@@ -66,15 +86,18 @@ def run_network(duration, update=False, drive=0):
         if update:
             network.robot_parameters.update(
                 SimulationParameters(
-                    # amplitude_gradient=None,
+                    drive = drivedt[i],
                     # phase_lag_body=None
                 )
             )
         network.step(i, time0, timestep)
         phases_log[i+1, :] = network.state.phases(iteration=i+1)
         amplitudes_log[i+1, :] = network.state.amplitudes(iteration=i+1)
-        outputs_log[i+1, :] = network.get_motor_position_output(iteration=i+1)
+        outputs_log[i + 1, :] = network.get_motor_position_output(iteration=i + 1)
         freqs_log[i+1, :] = network.robot_parameters.freqs
+        nomamp_log[i+1, :] = network.robot_parameters.nominal_amplitudes
+        instfreq_log[i + 1, :] = network.get_inst_freq(iteration=i+1)
+
     # # Alternative option
     # phases_log[:, :] = network.state.phases()
     # amplitudes_log[:, :] = network.state.amplitudes()
@@ -89,12 +112,24 @@ def run_network(duration, update=False, drive=0):
 
     # Implement plots of network results
     pylog.warning('Implement plots')
+    fig,ax=plt.subplots(4)
+    ax[0].plot(times,drivedt)
+
+    ax[1].plot(times,instfreq_log)
+
+
+    ax[2].plot(times, outputs_log[:, 0]+1)
+    ax[2].plot(times, outputs_log[:, 4]-1)
+    ax[3].plot(times,outputs_log[:,-4:])
+
+
+
 
 
 def main(plot):
     """Main"""
 
-    run_network(duration=5)
+    run_network(duration=20)
 
     # Show plots
     if plot:

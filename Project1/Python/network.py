@@ -62,7 +62,31 @@ def motor_output(phases, amplitudes, iteration):
 
     """
     # Implement equation here
-    return np.zeros_like(phases)[:12] + np.zeros_like(amplitudes)[:12]
+    #q = amplitudes[:8]*(1+np.cos(phases[:8]))-amplitudes[8:16]*(1+np.cos(phases[:8]))
+    x = amplitudes*(1+np.cos(phases))
+    return np.concatenate((x[:8],x[-4:]))
+
+def inst_freq(array = None):
+    """Inst_freq
+
+
+    Parameters
+    ----------
+    dtheta: <np.array>
+    Derivates of the phases of the oscillator
+
+    Returns
+    -------
+    : <np.array>
+        Instantaneous frequencies
+
+    """
+    dtheta = array[:20]
+
+    i_freq = dtheta/(2*np.pi)
+    return i_freq
+
+
 
 
 class SalamandraNetwork:
@@ -105,4 +129,14 @@ class SalamandraNetwork:
             self.state.amplitudes(iteration=iteration),
             iteration=iteration,
         )
+
+    def get_inst_freq(self, iteration=None):
+        """Get instantaneous frequency"""
+        state = np.concatenate((self.state.phases(iteration=iteration),
+                        self.state.amplitudes(iteration=iteration)))
+
+        return inst_freq(array=network_ode(_time=0, state=state, robot_parameters=self.robot_parameters)
+        )
+
+
 

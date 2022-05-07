@@ -2,6 +2,7 @@
 
 import numpy as np
 from farms_core import pylog
+from pandas import *
 
 
 class RobotParameters(dict):
@@ -43,13 +44,13 @@ class RobotParameters(dict):
         #pylog.warning('Coupling weights must be set')
 
         for i in np.arange(self.n_oscillators_body):
-            if (1.0 <= parameters.drive_mlr[i] <= 5.0):
-               self.freqs[i] =  0.2*parameters.drive_mlr[i] + 0.3
+            if (1.0 <= parameters.drive <= 5.0):
+               self.freqs[i] =  0.2*parameters.drive + 0.3
             else: 
                 self.freqs[i] = 0.0
         for i in np.arange(self.n_oscillators_body, self.n_oscillators): 
-            if (1.0 <= parameters.drive_mlr[i] <= 3.0):
-               self.freqs[i] =  0.2*parameters.drive_mlr[i] + 0.0
+            if (1.0 <= parameters.drive <= 3.0):
+               self.freqs[i] =  0.2*parameters.drive + 0.0
             else: 
                 self.freqs[i] = 0.0
 
@@ -92,6 +93,7 @@ class RobotParameters(dict):
             if (12 <= i < 16):
                  self.coupling_weights[i,19] = 30
 
+
         return
         
 
@@ -114,13 +116,14 @@ class RobotParameters(dict):
             if ((not (i == 0)) and (not (i == 8)) and (i < 16)):  #downward link
                 self.phase_bias[i,i-1] = (-2/8)*np.pi
             if ((not (i == 7)) and (not(i == 15)) and (i < 16)):  #upward link
-                self.phase_bias[i,i+1] = (2/8)*np.pi
+                self.phase_bias[i,i+1] = (+2/8)*np.pi
 
             # colateral links
             if (i < 8):
                 self.phase_bias[i,8+i] = np.pi
             if (8 <= i < 16): 
                 self.phase_bias[i,i-8] = np.pi
+
 
             #limb to body links
             if (0 <= i < 4):
@@ -131,7 +134,7 @@ class RobotParameters(dict):
                     self.phase_bias[i,17] = np.pi
             if (12 <= i < 16):
                     self.phase_bias[i,19] = np.pi
-                    
+
         return
 
     def set_amplitudes_rate(self, parameters):
@@ -145,13 +148,13 @@ class RobotParameters(dict):
         """Set nominal amplitudes"""
         #pylog.warning('Nominal amplitudes must be set')
         for i in np.arange(self.n_oscillators_body): 
-            if (1.0 <= parameters.drive_mlr[i] <= 5.0):
-               self.nominal_amplitudes[i] =  0.065*parameters.drive_mlr[i] + 0.196
+            if (1.0 <= parameters.drive <= 5.0):
+               self.nominal_amplitudes[i] =  0.065*parameters.drive + 0.196
             else: 
                 self.nominal_amplitudes[i] = 0.0
         for i in np.arange(self.n_oscillators_body,self.n_oscillators):
-            if (1.0 <= parameters.drive_mlr[i] <= 3.0):
-               self.nominal_amplitudes[i] =  0.131*parameters.drive_mlr[i] + 0.131
+            if (1.0 <= parameters.drive <= 3.0):
+               self.nominal_amplitudes[i] =  0.131*parameters.drive + 0.131
             else: 
                 self.nominal_amplitudes[i] = 0.0
                 
