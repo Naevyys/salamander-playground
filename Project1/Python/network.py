@@ -3,9 +3,10 @@
 import numpy as np
 from scipy.integrate import ode
 from robot_parameters import RobotParameters
+from math import *
 
 
-def network_ode(_time, state, robot_parameters, loads):
+def network_ode(_time, state, robot_parameters):
     """Network_ODE
 
     Parameters
@@ -16,21 +17,32 @@ def network_ode(_time, state, robot_parameters, loads):
         ODE states at time _time
     robot_parameters: <RobotParameters>
         Instance of RobotParameters
-    loads: <np.array>
-        The lateral forces applied to the body links
 
     Returns
     -------
-    dstate: <np.array>
+    :<np.array>
         Returns derivative of state (phases and amplitudes)
 
     """
     n_oscillators = robot_parameters.n_oscillators
     phases = state[:n_oscillators]
     amplitudes = state[n_oscillators:2*n_oscillators]
-    # Implement equation here
 
-    return np.concatenate([np.zeros_like(phases), np.zeros_like(amplitudes)])
+    # Import parameters
+    freqs=robot_parameters.freqs
+    weights=robot_parameters.coupling_weights
+    phase_bias=robot_parameters.phase_bias
+    nominal_amplitudes=robot_parameters.nominal_amplitudes
+    rates=robot_parameters.rates
+
+    # Implement equation here
+    phases_repeated=np.tile(phases,(len(phases),1))
+
+    dtheta=2*pi*freqs+np.sum(amplitudes*weights*np.sin(phases-phases_repeated.T-phase_bias),axis=1)
+
+    dr=rates*(nominal_amplitudes-amplitudes)
+
+    return np.concatenate([dtheta, dr])
 
 
 def motor_output(phases, amplitudes, iteration):
@@ -45,7 +57,7 @@ def motor_output(phases, amplitudes, iteration):
 
     Returns
     -------
-    motor_outputs: <np.array>
+    : <np.array>
         Motor outputs for joint in the system.
 
     """
@@ -67,20 +79,18 @@ class SalamandraNetwork:
         # Replace your oscillator phases here
         self.state.set_phases(
             iteration=0,
-            value=1e-4*np.random.rand(self.robot_parameters.n_oscillators),
+            value=1e-4*np.random.ranf(self.robot_parameters.n_oscillators),
         )
         # Set solver
         self.solver = ode(f=network_ode)
         self.solver.set_integrator('dopri5')
         self.solver.set_initial_value(y=self.state.array[0], t=0.0)
 
-    def step(self, iteration, time, timestep, loads=None):
+    def step(self, iteration, time, timestep):
         """Step"""
-        if loads is None:
-            loads = np.zeros(self.robot_parameters.n_joints)
         if iteration + 1 >= self.n_iterations:
             return
-        self.solver.set_f_params(self.robot_parameters, loads)
+        self.solver.set_f_params(self.robot_parameters)
         self.state.array[iteration+1, :] = self.solver.integrate(time+timestep)
 
     def outputs(self, iteration=None):

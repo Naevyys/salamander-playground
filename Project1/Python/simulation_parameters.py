@@ -1,4 +1,5 @@
 """Simulation parameters"""
+import numpy as np
 
 
 class SimulationParameters:
@@ -14,7 +15,7 @@ class SimulationParameters:
         self.phase_lag_body = None
         self.amplitude_gradient = None
         # Feel free to add more parameters (ex: MLR drive)
-        # self.drive_mlr = ...
+        self.drive_mlr = np.zeros(2*self.n_body_joints + self.n_legs_joints)
         # ...
 
         # Disruptions
