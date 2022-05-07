@@ -62,9 +62,26 @@ def motor_output(phases, amplitudes, iteration):
 
     """
     # Implement equation here
-    #q = amplitudes[:8]*(1+np.cos(phases[:8]))-amplitudes[8:16]*(1+np.cos(phases[:8]))
+    q = amplitudes[:8]*(1+np.cos(phases[:8])) - amplitudes[8:16]*(1+np.cos(phases[8:16]))
+    return q
+
+
+def x_output(phases,amplitudes):
+    """x output
+
+    Parameters
+    ----------
+    amplitudes: <np.array>
+        Amplitudes of the oscillator
+
+    Returns
+    -------
+    : <np.array>
+        x outputs for all oscillators in the system.
+
+    """
     x = amplitudes*(1+np.cos(phases))
-    return np.concatenate((x[:8],x[-4:]))
+    return x
 
 def inst_freq(array = None):
     """Inst_freq
@@ -128,6 +145,12 @@ class SalamandraNetwork:
             self.state.phases(iteration=iteration),
             self.state.amplitudes(iteration=iteration),
             iteration=iteration,
+        )
+
+    def get_x_output(self, iteration=None):
+        """Get x for all oscillators"""
+        return x_output(self.state.phases(iteration=iteration),
+        self.state.amplitudes(iteration=iteration)
         )
 
     def get_inst_freq(self, iteration=None):
