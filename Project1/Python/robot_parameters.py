@@ -2,7 +2,6 @@
 
 import numpy as np
 from farms_core import pylog
-from pandas import *
 
 
 class RobotParameters(dict):
@@ -44,13 +43,13 @@ class RobotParameters(dict):
         #pylog.warning('Coupling weights must be set')
 
         for i in np.arange(self.n_oscillators_body):
-            if (1.0 <= parameters.drive <= 5.0):
-               self.freqs[i] =  0.2*parameters.drive + 0.3
+            if (1.0 <= parameters.drive_mlr[i] <= 5.0):
+               self.freqs[i] =  0.2*parameters.drive_mlr[i] + 0.3
             else: 
                 self.freqs[i] = 0.0
         for i in np.arange(self.n_oscillators_body, self.n_oscillators): 
-            if (1.0 <= parameters.drive <= 3.0):
-               self.freqs[i] =  0.2*parameters.drive + 0.0
+            if (1.0 <= parameters.drive_mlr[i] <= 3.0):
+               self.freqs[i] =  0.2*parameters.drive_mlr[i] + 0.0
             else: 
                 self.freqs[i] = 0.0
 
@@ -92,7 +91,6 @@ class RobotParameters(dict):
                  self.coupling_weights[i,17] = 30
             if (12 <= i < 16):
                  self.coupling_weights[i,19] = 30
-
 
         return
         
@@ -148,13 +146,13 @@ class RobotParameters(dict):
         """Set nominal amplitudes"""
         #pylog.warning('Nominal amplitudes must be set')
         for i in np.arange(self.n_oscillators_body): 
-            if (1.0 <= parameters.drive <= 5.0):
-               self.nominal_amplitudes[i] =  0.065*parameters.drive + 0.196
+            if (1.0 <= parameters.drive_mlr[i] <= 5.0):
+               self.nominal_amplitudes[i] =  0.065*parameters.drive_mlr[i] + 0.196
             else: 
                 self.nominal_amplitudes[i] = 0.0
         for i in np.arange(self.n_oscillators_body,self.n_oscillators):
-            if (1.0 <= parameters.drive <= 3.0):
-               self.nominal_amplitudes[i] =  0.131*parameters.drive + 0.131
+            if (1.0 <= parameters.drive_mlr[i] <= 3.0):
+               self.nominal_amplitudes[i] =  0.131*parameters.drive_mlr[i] + 0.131
             else: 
                 self.nominal_amplitudes[i] = 0.0
                 

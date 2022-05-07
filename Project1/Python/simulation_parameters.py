@@ -16,8 +16,6 @@ class SimulationParameters:
         self.amplitude_gradient = None
         # Feel free to add more parameters (ex: MLR drive)
         self.drive = 0
-        #self.drive_mlr = self.drive*np.ones(2*self.n_body_joints + self.n_legs_joints)
-        #print(self.drive_mlr)
         # ...
 
         # Disruptions
@@ -30,5 +28,6 @@ class SimulationParameters:
         # Update object with provided keyword arguments
         # NOTE: This overrides the previous declarations
         self.__dict__.update(kwargs)
+        self.drive_mlr = self.drive*np.ones(2*self.n_body_joints + self.n_legs_joints)
 
 
