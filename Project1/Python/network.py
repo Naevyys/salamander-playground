@@ -62,7 +62,8 @@ def motor_output(phases, amplitudes, iteration):
 
     """
     # Implement equation here
-    q = amplitudes[:8]*(1+np.cos(phases[:8])) - amplitudes[8:16]*(1+np.cos(phases[8:16]))
+    q = np.zeros(12)
+    q[:8] = amplitudes[:8]*(1+np.cos(phases[:8])) - amplitudes[8:16]*(1+np.cos(phases[8:16]))
     return q
 
 
@@ -127,7 +128,7 @@ class SalamandraNetwork:
         self.solver.set_integrator('dopri5')
         self.solver.set_initial_value(y=self.state.array[0], t=0.0)
 
-    def step(self, iteration, time, timestep):
+    def step(self, iteration, time, timestep, loads):
         """Step"""
         if iteration + 1 >= self.n_iterations:
             return
