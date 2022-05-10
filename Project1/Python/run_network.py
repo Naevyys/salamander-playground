@@ -31,7 +31,7 @@ def run_network(duration, update=False, drive=0):
     sim_parameters = SimulationParameters(
         drive=drive,
         amplitude_gradient=None,
-        phase_lag_body=None,
+        phase_lag_body= ((2*np.pi)/8),
         turn=None,
     )
     state = SalamandraState.salamandra_robotica_2(n_iterations)
@@ -86,10 +86,10 @@ def run_network(duration, update=False, drive=0):
             network.robot_parameters.update(
                 SimulationParameters(
                     drive = drivedt[i],
-                    # phase_lag_body=None
+                    phase_lag_body= ((2*np.pi)/8)
                 )
             )
-        network.step(i, time0, timestep)
+        network.step(i, time0, timestep, loads = None)
         phases_log[i+1, :] = network.state.phases(iteration=i+1)
         amplitudes_log[i+1, :] = network.state.amplitudes(iteration=i+1)
         x_outputs_log[i+1, :] = network.get_x_output(iteration=i+1)
@@ -114,6 +114,7 @@ def run_network(duration, update=False, drive=0):
     #pylog.warning('Implement plots')
 
     
+
     #For coupled oscillators 
 
     fig,ax=plt.subplots(4)
@@ -128,6 +129,7 @@ def run_network(duration, update=False, drive=0):
     ax[3].plot(times,drivedt)
     ax[3].set_ylabel('drive d')
     ax[3].set_xlabel('Time [s]')
+    #print(instfreq_log[:,-1])
 
 
     fig0,ax0=plt.subplots()
@@ -155,7 +157,8 @@ def run_network(duration, update=False, drive=0):
     ax1p2[1].set_ylabel('R')
     ax1p2[1].set_xlabel('drive d')
     ax1p2[0].set_title('For all oscillators')
-    '''
+      '''
+    
     
 
 def main(plot):
