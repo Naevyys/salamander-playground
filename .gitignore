@@ -130,3 +130,6 @@ dmypy.json
 
 # Pycharm
 **/.idea/
+
+# example log files
+./Project1/Python/logs/example
