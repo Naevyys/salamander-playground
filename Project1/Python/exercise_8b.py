@@ -40,9 +40,9 @@ def exercise_8b(timestep):
     """Exercise 8b"""
 
     # Grid search parameters
-    n_vals = 2  # TODO: Try first with 2 values for each param to see if the rest of the code fully works, then augment
-    amplitude_vals = np.stack([np.linspace(i, i+3, num=3) for i in range(n_vals)], axis=0)  # TODO: choose good values
-    phase_lag_vals = np.linspace(0, 5, num=n_vals)  # TODO: choose good values
+    n_vals = 4
+    amplitude_vals = np.linspace(1, 4, num=n_vals)  # TODO: choose good values
+    phase_lag_vals = np.linspace(0, 2*np.pi/8, num=n_vals)  # TODO: choose good values
 
     # Parameters
     parameter_set = [
@@ -67,13 +67,15 @@ def exercise_8b(timestep):
     # Grid search
     directory = './logs/exercise8b'
     os.makedirs(directory, exist_ok=True)
+    for f in os.listdir(directory):
+        os.remove(os.path.join(directory, f))  # Delete all existing files before running the new simulations
     for simulation_i, sim_parameters in enumerate(parameter_set):
         filename = directory + '/simulation_{}.{}'
         sim, data = simulation(
             sim_parameters=sim_parameters,  # Simulation parameters, see above
             arena='water',  # Swimming
-            # fast=True,  # For fast mode (not real-time)  # TODO: Set this to True if simulation takes too much time
-            # headless=True,  # For headless mode (No GUI, could be faster)  # TODO: same
+            fast=True,  # For fast mode (not real-time)  # TODO: Set this to True if simulation takes too much time
+            headless=True,  # For headless mode (No GUI, could be faster)  # TODO: same
             # record=True,  # Record video
         )
         # Log robot data

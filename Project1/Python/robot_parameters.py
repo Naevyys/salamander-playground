@@ -29,6 +29,7 @@ class RobotParameters(dict):
         self.rates = np.zeros(self.n_oscillators)
         self.nominal_amplitudes = np.zeros(self.n_oscillators)
         self.phase_lag_body = parameters.phase_lag_body
+        self.amplitude_gradient = parameters.amplitude_gradient
         self.update(parameters)
 
     def update(self, parameters):
@@ -140,8 +141,11 @@ class RobotParameters(dict):
     def set_amplitudes_rate(self, parameters):
         """Set amplitude rates"""
         #pylog.warning('Convergence rates must be set')
-        for i in np.arange(self.n_oscillators): 
-            self.rates[i] = 20.0
+        for i in np.arange(self.n_oscillators):
+            if i >= 16:
+                self.rates[i] = 20.0
+            else:
+                self.rates[i] = self.amplitude_gradient[i]
         return 
 
     def set_nominal_amplitudes(self, parameters):
