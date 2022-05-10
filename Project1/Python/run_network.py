@@ -30,7 +30,8 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
     n_iterations = len(times)
     sim_parameters = SimulationParameters(
         drive=drive,
-        amplitude_gradient=[R_head,R_tail],
+        #amplitudes =[R_head,R_tail],
+        amplitudes= 20.0,
         phase_lag_body= ((2*np.pi)/8),
         turn=None,
     )
@@ -86,7 +87,8 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
             network.robot_parameters.update(
                 SimulationParameters(
                     drive = drivedt[i],
-                    amplitude_gradient=[R_head,R_tail],
+                    #amplitudes=[R_head,R_tail],
+                    amplitudes= 20.0,
                     phase_lag_body= ((2*np.pi)/8),
                     
                 )
@@ -115,9 +117,7 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
     # Implement plots of network results
     #pylog.warning('Implement plots')
 
-    
-
-
+    #'''
     #For coupled oscillators 
 
     fig,ax=plt.subplots(4)
@@ -164,6 +164,7 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
     ax1p2[1].set_ylabel('R')
     ax1p2[1].set_xlabel('drive d')
     ax1p2[0].set_title('For all oscillators')
+    
     '''
     
     
