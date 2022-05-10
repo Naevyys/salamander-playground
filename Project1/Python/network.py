@@ -158,7 +158,6 @@ class SalamandraNetwork:
         """Get instantaneous frequency"""
         state = np.concatenate((self.state.phases(iteration=iteration),
                         self.state.amplitudes(iteration=iteration)))
-
         return inst_freq(array=network_ode(_time=0, state=state, robot_parameters=self.robot_parameters)
         )
 
