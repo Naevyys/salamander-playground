@@ -147,7 +147,7 @@ class RobotParameters(dict):
             else:
                 self.rates[i] = self.amplitude_gradient[i]
 
-        print(self.rates)
+        #print(self.rates)
         return 
 
     def set_nominal_amplitudes(self, parameters):

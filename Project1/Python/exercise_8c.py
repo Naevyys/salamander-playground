@@ -24,11 +24,18 @@ def compute_velocity(pos, start_time=400, end_time=-1):
 def compute_energy(joint_torque, joint_velocities):
     return np.sum(np.multiply(joint_torque, joint_velocities))
 
-def convert_nd_matrix_to_nd_plot_coordinates(m):
+def convert_nd_matrix_to_nd_plot_coordinates(m, x_vals=None, y_vals=None):
 
     coordinates = np.zeros((np.prod(m.shape), len(m.shape) + 1))
     for i, c in enumerate(np.ndindex(m.shape)):
-        coordinates[i, :len(m.shape)] = c
+        if x_vals is not None:
+            coordinates[i, 0] = x_vals[c[0]]
+        else:
+            coordinates[i, 0] = c[0]
+        if len(c) > 1 and y_vals is not None:
+            coordinates[i, 1] = y_vals[c[1]]
+        elif len(c) > 1:
+            coordinates[i, 1] = c[1]
         coordinates[i, len(m.shape)] = m[c]
 
     return coordinates
@@ -92,8 +99,8 @@ def exercise_8c(timestep):
         velocities[amp_1, amp_2] = compute_velocity(start_time = 0, pos = links_positions)
         energies[amp_1, amp_2] = compute_energy(joints_torques, joints_velocities)
 
-    coordinates_velocities = convert_nd_matrix_to_nd_plot_coordinates(velocities) 
-    coordinates_energy = convert_nd_matrix_to_nd_plot_coordinates(energies) 
+    coordinates_velocities = convert_nd_matrix_to_nd_plot_coordinates(velocities,x_vals = amplitude_vals, y_vals= amplitude_vals) 
+    coordinates_energy = convert_nd_matrix_to_nd_plot_coordinates(energies,x_vals = amplitude_vals, y_vals= amplitude_vals) 
 
     plot_2d(coordinates_velocities, ("Amplitude head", "Amplitude tail", "Velocity"))
     plot_2d(coordinates_energy, ("Amplitude head", "Amplitude tail" , "Energy"))
