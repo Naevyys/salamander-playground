@@ -11,7 +11,7 @@ from simulation_parameters import SimulationParameters
 from network import SalamandraNetwork
 
 
-def run_network(duration, update=False, drive=0):
+def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
     """Run network without MuJoCo and plot results
     Parameters
     ----------
@@ -30,7 +30,7 @@ def run_network(duration, update=False, drive=0):
     n_iterations = len(times)
     sim_parameters = SimulationParameters(
         drive=drive,
-        amplitude_gradient=None,
+        amplitude_gradient=[R_head,R_tail],
         phase_lag_body= ((2*np.pi)/8),
         turn=None,
     )
@@ -86,7 +86,9 @@ def run_network(duration, update=False, drive=0):
             network.robot_parameters.update(
                 SimulationParameters(
                     drive = drivedt[i],
-                    phase_lag_body= ((2*np.pi)/8)
+                    amplitude_gradient=[R_head,R_tail],
+                    phase_lag_body= ((2*np.pi)/8),
+                    
                 )
             )
         network.step(i, time0, timestep, loads = None)
@@ -114,6 +116,7 @@ def run_network(duration, update=False, drive=0):
     #pylog.warning('Implement plots')
 
     
+
 
     #For coupled oscillators 
 
@@ -144,9 +147,13 @@ def run_network(duration, update=False, drive=0):
 
     fig1p1,ax1p1=plt.subplots(4)
     ax1p1[0].plot(times,x_outputs_log)
+    ax1p1[0].set_ylabel('x')
     ax1p1[1].plot(times,instfreq_log)
+    ax1p1[1].set_ylabel('Freq [Hz]')
     ax1p1[2].plot(times,amplitudes_log)
+    ax1p1[2].set_ylabel('r')
     ax1p1[3].plot(times,drivedt)
+    ax1p1[3].set_ylabel('drive d')
     ax1p1[3].set_xlabel('Time [s]')
     ax1p1[0].set_title('For all oscillators')
 
@@ -157,7 +164,7 @@ def run_network(duration, update=False, drive=0):
     ax1p2[1].set_ylabel('R')
     ax1p2[1].set_xlabel('drive d')
     ax1p2[0].set_title('For all oscillators')
-      '''
+    '''
     
     
 

@@ -29,6 +29,7 @@ class RobotParameters(dict):
         self.rates = np.zeros(self.n_oscillators)
         self.nominal_amplitudes = np.zeros(self.n_oscillators)
         self.phase_lag_body = parameters.phase_lag_body
+        self.amplitude_gradient = parameters.amplitude_gradient
         self.update(parameters)
 
     def update(self, parameters):
