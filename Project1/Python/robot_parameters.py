@@ -133,6 +133,7 @@ class RobotParameters(dict):
             if (12 <= i < 16):
                     self.phase_bias[i,19] = np.pi
 
+        self.phase_bias = self.phase_bias.T
         return
 
     def set_amplitudes_rate(self, parameters):
