@@ -26,11 +26,18 @@ def compute_energy(joint_torque, joint_velocities):
     return np.sum(np.multiply(joint_torque, joint_velocities))
 
 
-def convert_nd_matrix_to_nd_plot_coordinates(m):
+def convert_nd_matrix_to_nd_plot_coordinates(m, x_vals=None, y_vals=None):
 
     coordinates = np.zeros((np.prod(m.shape), len(m.shape) + 1))
     for i, c in enumerate(np.ndindex(m.shape)):
-        coordinates[i, :len(m.shape)] = c
+        if x_vals is not None:
+            coordinates[i, 0] = x_vals[c[0]]
+        else:
+            coordinates[i, 0] = c[0]
+        if len(c) > 1 and y_vals is not None:
+            coordinates[i, 1] = y_vals[c[1]]
+        elif len(c) > 1:
+            coordinates[i, 1] = c[1]
         coordinates[i, len(m.shape)] = m[c]
 
     return coordinates
@@ -40,9 +47,10 @@ def exercise_8b(timestep):
     """Exercise 8b"""
 
     # Grid search parameters
-    n_vals = 4
-    amplitude_vals = np.linspace(1, 4, num=n_vals)  # TODO: choose good values
-    phase_lag_vals = np.linspace(0, 2*np.pi/8, num=n_vals)  # TODO: choose good values
+    amp_n_vals = 10
+    phase_n_vals = 8
+    amplitude_vals = np.linspace(1, 20, num=amp_n_vals)
+    phase_lag_vals = np.linspace(0, 2*np.pi/4, num=phase_n_vals)
 
     # Parameters
     parameter_set = [
@@ -51,8 +59,8 @@ def exercise_8b(timestep):
             timestep=timestep,  # Simulation timestep in [s]
             spawn_position=[0, 0, 0.1],  # Robot position in [m]
             spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
-            drive=4,  # TODO: check if this value makes sense, change if needed
-            amplitudes=amplitudes,  # Just an example  # TODO: check if name of key is correct...
+            drive=4,
+            amplitudes=amplitudes,  # Just an example
             phase_lag_body=phase_lag,  # or np.zeros(n_joints) for example
             turn=0,  # Another example
             # ...
@@ -61,8 +69,8 @@ def exercise_8b(timestep):
         for phase_lag in phase_lag_vals
     ]
 
-    velocities = np.zeros((n_vals, n_vals))
-    energies = np.zeros((n_vals, n_vals))
+    velocities = np.zeros((amp_n_vals, phase_n_vals))
+    energies = np.zeros((amp_n_vals, phase_n_vals))
 
     # Grid search
     directory = './logs/exercise8b'
@@ -74,8 +82,8 @@ def exercise_8b(timestep):
         sim, data = simulation(
             sim_parameters=sim_parameters,  # Simulation parameters, see above
             arena='water',  # Swimming
-            fast=True,  # For fast mode (not real-time)  # TODO: Set this to True if simulation takes too much time
-            headless=True,  # For headless mode (No GUI, could be faster)  # TODO: same
+            fast=True,  # For fast mode (not real-time)
+            headless=True,  # For headless mode (No GUI, could be faster)
             # record=True,  # Record video
         )
         # Log robot data
@@ -88,19 +96,22 @@ def exercise_8b(timestep):
         joints_velocities = data.sensors.joints.velocities_all()
         joints_torques = data.sensors.joints.motor_torques_all()
 
-        amp_i = simulation_i // n_vals
-        phase_i = simulation_i % n_vals
+        amp_i = simulation_i // amp_n_vals
+        phase_i = simulation_i % phase_n_vals
 
         velocities[amp_i, phase_i] = compute_velocity(links_positions)
         energies[amp_i, phase_i] = compute_energy(joints_torques, joints_velocities)
 
-    coordinates_velocities = convert_nd_matrix_to_nd_plot_coordinates(velocities)
-    coordinates_energy = convert_nd_matrix_to_nd_plot_coordinates(energies)
+    coordinates_velocities = convert_nd_matrix_to_nd_plot_coordinates(velocities, x_vals=amplitude_vals, y_vals=phase_lag_vals)
+    coordinates_energy = convert_nd_matrix_to_nd_plot_coordinates(energies, x_vals=amplitude_vals, y_vals=phase_lag_vals)
 
-    plot_2d(coordinates_velocities, ("Amplitude (not real values used, TODO)", "Phase", "Velocity"))
-    plot_2d(coordinates_energy, ("Amplitude (not real values used, TODO)", "Phase", "Energy"))
+    plot_2d(coordinates_velocities, ("Amplitude", "Phase", "Velocity"))
+    plot_2d(coordinates_energy, ("Amplitude", "Phase", "Energy"))
 
 
 if __name__ == '__main__':
     exercise_8b(timestep=1e-2)
 
+
+# TODO: Questions
+# - amplitudes = a factor, is that correct?
