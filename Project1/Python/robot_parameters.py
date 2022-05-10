@@ -141,8 +141,11 @@ class RobotParameters(dict):
     def set_amplitudes_rate(self, parameters):
         """Set amplitude rates"""
         #pylog.warning('Convergence rates must be set')
-        for i in np.arange(self.n_oscillators): 
-            self.rates[i] = 20.0
+        for i in np.arange(self.n_oscillators):
+            if i >= 16:
+                self.rates[i] = 20.0
+            else:
+                self.rates[i] = self.amplitude_gradient[i]
         return 
 
     def set_nominal_amplitudes(self, parameters):

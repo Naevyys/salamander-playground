@@ -89,6 +89,12 @@ def plot_2d(results, labels, n_data=300, log=False, cmap=None, plot=True):
     cbar = plt.colorbar()
     cbar.set_label(labels[2])
 
+    # Show plots
+    if plot:
+        plt.show()
+    else:
+        save_figures()
+
 
 def main(directory='logs/example', sim_number='0', suffix="", plot=True):
     """Main"""
@@ -110,7 +116,7 @@ def main(directory='logs/example', sim_number='0', suffix="", plot=True):
     osc_amplitudes = data.state.amplitudes()
     links_positions = data.sensors.links.urdf_positions()
     head_positions = links_positions[:, 0, :]
-    tail_positions = links_positions[:, 8, :]
+    tail_positions = links_positions[:, 7, :]
     joints_positions = data.sensors.joints.positions_all()
     joints_velocities = data.sensors.joints.velocities_all()
     joints_torques = data.sensors.joints.motor_torques_all()
@@ -120,10 +126,61 @@ def main(directory='logs/example', sim_number='0', suffix="", plot=True):
     # For the joints arrays: positions[iteration, joint]
 
     # Plot data
-    plt.figure('Positions')
+    """plt.figure('Positions')
     plot_positions(times, head_positions)
     plt.figure('Trajectory')
     plot_trajectory(head_positions)
+
+    for i, phases in enumerate(osc_phases.T):
+        plt.figure('Simulation {}, oscillator phases'.format(sim_number))
+        plot_1d(np.stack([times, phases], axis=1), ("Time", "Phase"))
+    plt.show()
+
+    for i, amp in enumerate(osc_amplitudes.T):
+        plt.figure('Simulation {}, oscillator amplitudes'.format(sim_number))
+        plot_1d(np.stack([times, amp], axis=1), ("Time", "Phase"))
+    plt.show()
+
+    for i, pos in enumerate(joints_positions.T):
+        if i > 0:
+            break
+        plt.figure('Simulation {}, joint positions'.format(sim_number))
+        plot_1d(np.stack([times, pos], axis=1), ("Time", "Position"))
+    plt.show()
+
+    for i, vel in enumerate(joints_velocities.T):
+        if i > 0:
+            break
+        plt.figure('Simulation {}, joint velocities'.format(sim_number))
+        plot_1d(np.stack([times, vel], axis=1), ("Time", "Velocity"))
+    plt.show()
+
+    for i, tor in enumerate(joints_torques.T):
+        if i > 0:
+            break
+        plt.figure('Simulation {}, joint torques'.format(sim_number))
+        plot_1d(np.stack([times, tor], axis=1), ("Time", "Torque"))
+    plt.show()"""
+
+    plt.figure("Simulation {}, head and tail positions in y".format(sim_number))
+    plot_1d(np.stack([times, head_positions[:, 0]], axis=1), ("Time", "Position"))  # 0 is y, 1 is x lol
+    plot_1d(np.stack([times, tail_positions[:, 0]], axis=1), ("Time", "Position"))
+    plt.show()
+
+    plt.figure("Simulation {}, head and tail positions in x".format(sim_number))
+    plot_1d(np.stack([times, head_positions[:, 1]], axis=1), ("Time", "Position"))  # 0 is y, 1 is x lol
+    plot_1d(np.stack([times, tail_positions[:, 1]], axis=1), ("Time", "Position"))
+    plt.show()
+
+    plt.figure("Simulation {}, head and tail positions in z".format(sim_number))
+    plot_1d(np.stack([times, np.mean(links_positions, axis=1)[:, 1]], axis=1), ("Time", "Position"))  # 0 is y, 1 is x lol
+    plot_1d(np.stack([times, np.mean(links_positions, axis=1)[:, 0]], axis=1), ("Time", "Position"))
+    plt.show()
+
+    plt.figure("Simulation {}, head and tail positions in x, y".format(sim_number))
+    plot_1d(np.stack([head_positions[:, 1], head_positions[:, 0]], axis=1), ("x", "y"))  # 0 is y, 1 is x lol
+    plot_1d(np.stack([tail_positions[:, 1], tail_positions[:, 0]], axis=1), ("x", "y"))
+    plt.show()
 
     # Show plots
     if plot:
@@ -134,4 +191,5 @@ def main(directory='logs/example', sim_number='0', suffix="", plot=True):
 
 if __name__ == '__main__':
     main(plot=not save_plots())
+    main(plot=not save_plots(), sim_number='1')
 
