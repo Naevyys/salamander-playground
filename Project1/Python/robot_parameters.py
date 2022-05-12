@@ -82,9 +82,9 @@ class RobotParameters(dict):
 
             # colateral links
             if (i < 8):
-                self.coupling_weights[i,8+i] = 10
-            if (8 <= i < 16): 
-                self.coupling_weights[i,i-8] = 10
+                self.coupling_weights[i,8+i] = parameters.colat_weight
+            if (8 <= i < 16):
+                self.coupling_weights[i,i-8] = parameters.colat_weight
 
             #limb to body links
             if (0 <= i < 4):

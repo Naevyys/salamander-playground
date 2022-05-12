@@ -13,6 +13,7 @@ class SimulationParameters:
         self.duration = 30
         self.initial_phases = None
         self.phase_lag_body = ((2*np.pi)/8)
+        self.colat_weight=10
         self.amplitude_gradient = None
         # Feel free to add more parameters (ex: MLR drive)
         self.drive = 0
