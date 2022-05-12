@@ -34,7 +34,7 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
         amplitude_gradient=[R_head,R_tail],
         amplitude_gradient_scaling = True,
         phase_lag_body= ((2*np.pi)/8),
-        turn=None,
+        turn=0,
     )
     state = SalamandraState.salamandra_robotica_2(n_iterations)
     network = SalamandraNetwork(sim_parameters, n_iterations, state)
