@@ -157,14 +157,9 @@ class RobotParameters(dict):
 
     def set_nominal_amplitudes(self, parameters):
         """Set nominal amplitudes"""
-<<<<<<< HEAD
-        #pylog.warning('Nominal amplitudes must be set')
-
-=======
 
         #Induce turning
         parameters.drive_mlr += np.concatenate((np.ones(8)*parameters.turn, -np.ones(8)*parameters.turn, np.zeros(4)))
->>>>>>> 44f8837a6d2eb01c4cb6e86ecd4a8083ff799ac6
 
         for i in np.arange(self.n_oscillators_body): 
                 if (1.0 <= parameters.drive_mlr[i] <= 5.0):
