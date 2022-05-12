@@ -46,7 +46,7 @@ def exercise_8c(timestep):
 
     # Grid search parameters
     n_vals = 4
-    amplitude_vals = np.linspace(1, 50, num=n_vals)  # TODO: choose good values
+    amplitude_vals = np.linspace(-0.5, 0.5, num=n_vals)  # TODO: choose good values
     #amplitude_vals = 2  # TODO: choose good values
 
     # Parameters
