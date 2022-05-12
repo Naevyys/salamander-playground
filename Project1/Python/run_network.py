@@ -11,7 +11,7 @@ from simulation_parameters import SimulationParameters
 from network import SalamandraNetwork
 
 
-def run_network(duration, update=False, drive=0):
+def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
     """Run network without MuJoCo and plot results
     Parameters
     ----------
@@ -30,9 +30,10 @@ def run_network(duration, update=False, drive=0):
     n_iterations = len(times)
     sim_parameters = SimulationParameters(
         drive=drive,
-        amplitude_gradient=None,
-        phase_lag_body=None,
-        turn=0,
+        #amplitudes =[R_head,R_tail],
+        amplitudes= 20.0,
+        phase_lag_body= ((2*np.pi)/8),
+        turn=None,
     )
     state = SalamandraState.salamandra_robotica_2(n_iterations)
     network = SalamandraNetwork(sim_parameters, n_iterations, state)
@@ -86,10 +87,13 @@ def run_network(duration, update=False, drive=0):
             network.robot_parameters.update(
                 SimulationParameters(
                     drive = drivedt[i],
-                    # phase_lag_body=None
+                    #amplitudes=[R_head,R_tail],
+                    amplitudes= 20.0,
+                    phase_lag_body= ((2*np.pi)/8),
+                    
                 )
             )
-        network.step(i, time0, timestep, None)
+        network.step(i, time0, timestep, loads = None)
         phases_log[i+1, :] = network.state.phases(iteration=i+1)
         amplitudes_log[i+1, :] = network.state.amplitudes(iteration=i+1)
         x_outputs_log[i+1, :] = network.get_x_output(iteration=i+1)
@@ -113,48 +117,9 @@ def run_network(duration, update=False, drive=0):
     # Implement plots of network results
     #pylog.warning('Implement plots')
 
-    
-    #For coupled oscillators
+    #'''
+    #For coupled oscillators 
 
-    fig, ax = plt.subplots(4,sharex=True)
-    ax[0].plot(times, x_outputs_log[:, 7],color='green')
-    ax[0].plot(times, x_outputs_log[:, 6]+1,color='green')
-    ax[0].plot(times, x_outputs_log[:, 5]+2,color='green')
-    ax[0].plot(times, x_outputs_log[:, 4]+3,color='green')
-    ax[0].plot(times, x_outputs_log[:, 3]+4,color='blue')
-    ax[0].plot(times, x_outputs_log[:, 2]+5,color='blue')
-    ax[0].plot(times, x_outputs_log[:, 1]+6,color='blue')
-    ax[0].plot(times, x_outputs_log[:, 0]+7,color='blue')
-    ax[0].set_ylabel('x Body')
-
-
-
-    ax[1].plot(times, x_outputs_log[:, 16]+1,color='blue')
-    ax[1].plot(times, x_outputs_log[:, 18],color='green')
-    ax[1].set_ylabel('x Limb')
-
-
-    ax[2].plot(times, instfreq_log[:, :15],'k')
-    ax[2].plot(times, instfreq_log[:, -4],'k--')
-    ax[2].set_ylabel('Freq [Hz]')
-
-    ax[3].plot(times, drivedt)
-    ax[3].set_ylabel('drive d')
-    ax[3].set_xlabel('Time [s]')
-
-    fig, ax = plt.subplots()
-    ax.plot(times, outputs_log[:, 7],color='green')
-    ax.plot(times, outputs_log[:, 6]+1,color='green')
-    ax.plot(times, outputs_log[:, 5]+2,color='green')
-    ax.plot(times, outputs_log[:, 4]+3,color='green')
-    ax.plot(times, outputs_log[:, 3]+4,color='blue')
-    ax.plot(times, outputs_log[:, 2]+5,color='blue')
-    ax.plot(times, outputs_log[:, 1]+6,color='blue')
-    ax.plot(times, outputs_log[:, 0]+7,color='blue')
-    ax.set_ylabel('Setpoint body')
-
-
-"""
     fig,ax=plt.subplots(4)
     ax[0].plot(times, x_outputs_log[:, 0]+1)
     ax[0].plot(times, x_outputs_log[:, 4]-1)
@@ -163,18 +128,18 @@ def run_network(duration, update=False, drive=0):
     ax[1].plot(times,x_outputs_log[:,-3] - 1)
     ax[1].set_ylabel('x Limb')
     ax[2].plot(times,instfreq_log)
+    ax[2].set_ylabel('Freqs [Hz]')
+    ax[3].plot(times,drivedt)
+    ax[3].set_ylabel('drive d')
+    ax[3].set_xlabel('Time [s]')
+    #print(instfreq_log[:,-1])
 
 
-
-    fig0, ax0 = plt.subplots()
-    ax0.plot(times, outputs_log[:, -1])
+    fig0,ax0=plt.subplots()
+    ax0.plot(times,outputs_log[:,0])
     ax0.set_ylabel('q')
     ax0.set_xlabel('Time [s]')
     ax0.set_title('Spinal joint angle 1')
-
-
-
-
 
     
     '''
@@ -182,9 +147,13 @@ def run_network(duration, update=False, drive=0):
 
     fig1p1,ax1p1=plt.subplots(4)
     ax1p1[0].plot(times,x_outputs_log)
+    ax1p1[0].set_ylabel('x')
     ax1p1[1].plot(times,instfreq_log)
+    ax1p1[1].set_ylabel('Freq [Hz]')
     ax1p1[2].plot(times,amplitudes_log)
+    ax1p1[2].set_ylabel('r')
     ax1p1[3].plot(times,drivedt)
+    ax1p1[3].set_ylabel('drive d')
     ax1p1[3].set_xlabel('Time [s]')
     ax1p1[0].set_title('For all oscillators')
 
@@ -195,9 +164,11 @@ def run_network(duration, update=False, drive=0):
     ax1p2[1].set_ylabel('R')
     ax1p2[1].set_xlabel('drive d')
     ax1p2[0].set_title('For all oscillators')
+    
     '''
     
-"""
+    
+
 def main(plot):
     """Main"""
 

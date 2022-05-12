@@ -28,6 +28,8 @@ class RobotParameters(dict):
         self.phase_bias = np.zeros([self.n_oscillators, self.n_oscillators])
         self.rates = np.zeros(self.n_oscillators)
         self.nominal_amplitudes = np.zeros(self.n_oscillators)
+        self.phase_lag_body = parameters.phase_lag_body
+        self.amplitude_gradient = parameters.amplitude_gradient
         self.update(parameters)
 
     def update(self, parameters):
@@ -94,6 +96,7 @@ class RobotParameters(dict):
             if (12 <= i < 16):
                  self.coupling_weights[i,19] = 30
 
+
         return
         
 
@@ -114,9 +117,9 @@ class RobotParameters(dict):
 
             #upward and downward links
             if ((not (i == 0)) and (not (i == 8)) and (i < 16)):  #downward link
-                self.phase_bias[i,i-1] = (-2/8)*np.pi
+                self.phase_bias[i,i-1] = self.phase_lag_body
             if ((not (i == 7)) and (not(i == 15)) and (i < 16)):  #upward link
-                self.phase_bias[i,i+1] = (+2/8)*np.pi
+                self.phase_bias[i,i+1] = - self.phase_lag_body
 
             # colateral links
             if (i < 8):
@@ -140,8 +143,13 @@ class RobotParameters(dict):
     def set_amplitudes_rate(self, parameters):
         """Set amplitude rates"""
         #pylog.warning('Convergence rates must be set')
-        for i in np.arange(self.n_oscillators): 
-            self.rates[i] = 20.0
+        for i in np.arange(self.n_oscillators):
+            if i >= 16:
+                self.rates[i] = 20.0
+            else:
+                self.rates[i] = self.amplitude_gradient[i]
+
+        #print(self.rates)
         return 
 
     def set_nominal_amplitudes(self, parameters):
