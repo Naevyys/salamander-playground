@@ -14,6 +14,8 @@ class SimulationParameters:
         self.initial_phases = None
         self.phase_lag_body = ((2*np.pi)/8)
         self.amplitude_gradient = None
+        self.amplitude_scaling = 1
+        self.amplitude_gradient_scaling = False
         # Feel free to add more parameters (ex: MLR drive)
         self.drive = 0
         # ...
@@ -29,8 +31,10 @@ class SimulationParameters:
         # NOTE: This overrides the previous declarations
         self.__dict__.update(kwargs)
         self.drive_mlr = self.drive*np.ones(2*self.n_body_joints + self.n_legs_joints)
-        self.amplitude_gradient = kwargs["amplitudes"] * np.ones(8) if isinstance(kwargs["amplitudes"], float) else np.linspace(kwargs["amplitudes"][0], kwargs["amplitudes"][1], num=8)
-        self.amplitude_gradient = np.concatenate([self.amplitude_gradient, self.amplitude_gradient])
+
+        if kwargs["amplitude_gradient"] is not None:
+            self.amplitude_gradient = np.linspace(kwargs["amplitude_gradient"][0], kwargs["amplitude_gradient"][1], num=8)
+            self.amplitude_gradient = np.concatenate([self.amplitude_gradient, self.amplitude_gradient])
         #print(self.phase_lag_body)
 
 

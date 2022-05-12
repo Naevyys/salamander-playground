@@ -30,8 +30,9 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
     n_iterations = len(times)
     sim_parameters = SimulationParameters(
         drive=drive,
-        #amplitudes =[R_head,R_tail],
-        amplitudes= 20.0,
+        #amplitude_gradient= None,
+        amplitude_gradient=[R_head,R_tail],
+        amplitude_gradient_scaling = True,
         phase_lag_body= ((2*np.pi)/8),
         turn=None,
     )
@@ -87,9 +88,11 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
             network.robot_parameters.update(
                 SimulationParameters(
                     drive = drivedt[i],
-                    #amplitudes=[R_head,R_tail],
-                    amplitudes= 20.0,
+                    #amplitude_gradient= None,
+                    amplitude_gradient=[R_head,R_tail],
+                    amplitude_gradient_scaling = True,
                     phase_lag_body= ((2*np.pi)/8),
+
                     
                 )
             )
@@ -172,7 +175,7 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
 def main(plot):
     """Main"""
 
-    run_network(duration=40, update=True,drive=0.5)
+    run_network(duration=40, update=True,drive=0.5, R_head= 1, R_tail=0.1)
     # Show plots
     if plot:
         plt.show()
