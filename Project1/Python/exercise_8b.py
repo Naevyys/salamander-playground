@@ -47,9 +47,9 @@ def exercise_8b(timestep):
     """Exercise 8b"""
 
     # Grid search parameters
-    amp_n_vals = 10
+    amp_n_vals = 5
     phase_n_vals = 8
-    amplitude_vals = np.linspace(1, 20, num=amp_n_vals)
+    amplitude_vals = np.linspace(-0.5, 0.5, num=amp_n_vals)  # TODO: change
     phase_lag_vals = np.linspace(0, 2*np.pi/4, num=phase_n_vals)
 
     # Parameters
@@ -60,7 +60,7 @@ def exercise_8b(timestep):
             spawn_position=[0, 0, 0.1],  # Robot position in [m]
             spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
             drive=4,
-            amplitudes=amplitudes,  # Just an example
+            amplitude_gradient=amplitudes,  # Just an example
             phase_lag_body=phase_lag,  # or np.zeros(n_joints) for example
             turn=0,  # Another example
             # ...
@@ -96,7 +96,7 @@ def exercise_8b(timestep):
         joints_velocities = data.sensors.joints.velocities_all()
         joints_torques = data.sensors.joints.motor_torques_all()
 
-        amp_i = simulation_i // amp_n_vals
+        amp_i = simulation_i // phase_n_vals
         phase_i = simulation_i % phase_n_vals
 
         velocities[amp_i, phase_i] = compute_velocity(links_positions)
@@ -114,4 +114,12 @@ if __name__ == '__main__':
 
 
 # TODO: Questions
+# - 8a:
+#   -
 # - amplitudes = a factor, is that correct?
+# - what is a good range for the amplitudes?
+# - Is the calculation of the speed correct? Should we start at 0 or when it has stabilized?
+# - Is the energy calculation correct?
+# - What is meant by trying out other energy calculations?
+# - Are there sources of randomness
+# - 8c: what does the frequence of 1Hz mean?
