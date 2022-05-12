@@ -40,7 +40,9 @@ class RobotParameters(dict):
 
     def set_frequencies(self, parameters):
         """Set frequencies"""
-        #pylog.warning('Coupling weights must be set')
+
+        # Induce turning
+        parameters.drive_mlr += np.concatenate((np.ones(8) * parameters.turn, -np.ones(8) * parameters.turn, np.zeros(4)))
 
         for i in np.arange(self.n_oscillators_body):
             if (1.0 <= parameters.drive_mlr[i] <= 5.0):
@@ -144,7 +146,10 @@ class RobotParameters(dict):
 
     def set_nominal_amplitudes(self, parameters):
         """Set nominal amplitudes"""
-        #pylog.warning('Nominal amplitudes must be set')
+
+        #Induce turning
+        parameters.drive_mlr += np.concatenate((np.ones(8)*parameters.turn, -np.ones(8)*parameters.turn, np.zeros(4)))
+
         for i in np.arange(self.n_oscillators_body): 
             if (1.0 <= parameters.drive_mlr[i] <= 5.0):
                self.nominal_amplitudes[i] =  0.065*parameters.drive_mlr[i] + 0.196

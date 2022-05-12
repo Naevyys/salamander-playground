@@ -28,6 +28,7 @@ def network_ode(_time, state, robot_parameters):
     phases = state[:n_oscillators]
     amplitudes = state[n_oscillators:2*n_oscillators]
 
+
     # Import parameters
     freqs=robot_parameters.freqs
     weights=robot_parameters.coupling_weights
@@ -101,7 +102,7 @@ def inst_freq(array = None):
     """
     dtheta = array[:20]
 
-    i_freq = dtheta/(2*np.pi)
+    i_freq = dtheta/(2*pi)
     return i_freq
 
 

@@ -16,6 +16,7 @@ class SimulationParameters:
         self.amplitude_gradient = None
         # Feel free to add more parameters (ex: MLR drive)
         self.drive = 0
+        self.turn = 0
         # ...
 
         # Disruptions
