@@ -33,7 +33,7 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
         #amplitudes =[R_head,R_tail],
         amplitudes= 20.0,
         phase_lag_body= ((2*np.pi)/8),
-        turn=None,
+        turn=0,
     )
     state = SalamandraState.salamandra_robotica_2(n_iterations)
     network = SalamandraNetwork(sim_parameters, n_iterations, state)
