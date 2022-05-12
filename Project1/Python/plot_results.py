@@ -10,7 +10,7 @@ from salamandra_simulation.parse_args import save_plots
 from salamandra_simulation.save_figures import save_figures
 
 
-def plot_positions(times, link_data):
+def plot_positions(times, link_data, plot = True):
     """Plot positions"""
     for i, data in enumerate(link_data.T):
         plt.plot(times, data, label=['x', 'y', 'z'][i])
@@ -19,14 +19,26 @@ def plot_positions(times, link_data):
     plt.ylabel('Distance [m]')
     plt.grid(True)
 
+        # Show plots
+    if plot:
+        plt.show()
+    else:
+        save_figures()
 
-def plot_trajectory(link_data):
+
+def plot_trajectory(link_data, plot = True):
     """Plot positions"""
     plt.plot(link_data[:, 0], link_data[:, 1])
     plt.xlabel('x [m]')
     plt.ylabel('y [m]')
     plt.axis('equal')
     plt.grid(True)
+
+        # Show plots
+    if plot:
+        plt.show()
+    else:
+        save_figures()
 
 
 def plot_1d(results, labels):
@@ -110,7 +122,7 @@ def main(directory='logs/example', sim_number='0', suffix="", plot=True):
         step=timestep,
     )
     timestep = times[1] - times[0]
-    amplitudes = parameters.amplitudes
+    amplitude_scaling = parameters.amplitude_scaling
     phase_lag_body = parameters.phase_lag_body
     osc_phases = data.state.phases()
     osc_amplitudes = data.state.amplitudes()

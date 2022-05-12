@@ -29,9 +29,9 @@ class RobotParameters(dict):
         self.rates = np.zeros(self.n_oscillators)
         self.nominal_amplitudes = np.zeros(self.n_oscillators)
         self.phase_lag_body = parameters.phase_lag_body
-        self.amplitude_scaling = parameters.amplitude_scaling
-        self.amplitude_gradient = parameters.amplitude_gradient
-        self.amplitude_gradient_scaling = parameters.amplitude_gradient_scaling
+        #self.amplitude_scaling = parameters.amplitude_scaling
+        #self.amplitude_gradient = parameters.amplitude_gradient
+        #self.amplitude_gradient_scaling = parameters.amplitude_gradient_scaling
         self.update(parameters)
 
     def update(self, parameters):
@@ -78,15 +78,15 @@ class RobotParameters(dict):
 
             #upward and downward links
             if ((not (i == 0)) and (not(i == 8)) and (i < 16)):  #downward link
-                self.coupling_weights[i,i-1] = 10 
+                self.coupling_weights[i,i-1] = parameters.updown_coupling_weight
             if ((not (i == 7)) and (not(i == 15)) and (i < 16)):  #upward link
-                self.coupling_weights[i,i+1] = 10
+                self.coupling_weights[i,i+1] = parameters.updown_coupling_weight
 
             # colateral links
             if (i < 8):
-                self.coupling_weights[i,8+i] = parameters.colat_weight
+                self.coupling_weights[i,8+i] = parameters.contra_coupling_weight
             if (8 <= i < 16):
-                self.coupling_weights[i,i-8] = parameters.colat_weight
+                self.coupling_weights[i,i-8] = parameters.contra_coupling_weight
 
             #limb to body links
             if (0 <= i < 4):
@@ -163,14 +163,14 @@ class RobotParameters(dict):
 
         for i in np.arange(self.n_oscillators_body): 
                 if (1.0 <= parameters.drive_mlr[i] <= 5.0):
-                    if self.amplitude_gradient is None : 
-                        self.nominal_amplitudes[i] =  self.amplitude_scaling*0.065*parameters.drive_mlr[i] + 0.196
+                    if parameters.amplitude_gradient is None : 
+                        self.nominal_amplitudes[i] =  parameters.amplitude_scaling*0.065*parameters.drive_mlr[i] + 0.196
 
-                    elif (self.amplitude_gradient_scaling == True):
-                        self.nominal_amplitudes[i] =  self.amplitude_gradient[i]*0.065*parameters.drive_mlr[i] + 0.196
+                    elif (parameters.amplitude_gradient_scaling == True):
+                        self.nominal_amplitudes[i] =  parameters.amplitude_gradient[i]*0.065*parameters.drive_mlr[i] + 0.196
 
                     else: 
-                        self.nominal_amplitudes[i] =  self.amplitude_gradient[i]
+                        self.nominal_amplitudes[i] =  parameters.amplitude_gradient[i]
                 else: 
                     self.nominal_amplitudes[i] = 0.0
 

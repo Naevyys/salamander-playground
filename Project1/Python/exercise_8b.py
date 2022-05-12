@@ -49,7 +49,7 @@ def exercise_8b(timestep):
     # Grid search parameters
     amp_n_vals = 10
     phase_n_vals = 8
-    amplitude_vals = np.linspace(1, 20, num=amp_n_vals)
+    amplitude_vals = np.linspace(1, 5, num=amp_n_vals)
     phase_lag_vals = np.linspace(0, 2*np.pi/4, num=phase_n_vals)
 
     # Parameters
@@ -60,7 +60,8 @@ def exercise_8b(timestep):
             spawn_position=[0, 0, 0.1],  # Robot position in [m]
             spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
             drive=4,
-            amplitudes=amplitudes,  # Just an example
+            amplitude_scaling=amplitudes,  # Just an example
+            amplitude_gradient = None,
             phase_lag_body=phase_lag,  # or np.zeros(n_joints) for example
             turn=0,  # Another example
             # ...

@@ -45,8 +45,8 @@ def exercise_8c(timestep):
 
 
     # Grid search parameters
-    n_vals = 4
-    amplitude_vals = np.linspace(-0.5, 0.5, num=n_vals)  # TODO: choose good values
+    n_vals = 6
+    amplitude_vals = np.linspace(0, 1.5, num=n_vals)  # TODO: choose good values
     #amplitude_vals = 2  # TODO: choose good values
 
     # Parameters
@@ -57,7 +57,7 @@ def exercise_8c(timestep):
             spawn_position=[0, 0, 0.1],  # Robot position in [m]
             spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
             drive=3.5,  # ??? CHECK
-            amplitudes= [amplitude_1,amplitude_2] ,  # Just an example  # TODO: check if name of key is correct...
+            amplitude_gradient= [amplitude_1,amplitude_2] ,  # Just an example  # TODO: check if name of key is correct...
             phase_lag_body= ((2*np.pi)/8),  # TODO: check if this value makes sense, change if needed
             turn=0,  # Another example
             # ...

@@ -21,7 +21,8 @@ def exercise_8d1(timestep,duration):
             spawn_position=[0, 0, 0.1],  # Robot position in [m]
             spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
             drive=4,  # An example of parameter part of the grid search
-            amplitudes=[1, 2, 3],  # Just an example
+            #amplitudes=[1, 2, 3],
+            amplitude_gradient = None,  # Just an example
             phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
             turn=0.5,  # Another example
             # ...
@@ -56,7 +57,6 @@ def exercise_8d1(timestep,duration):
     head_positions = links_positions[:, 0, :]
     tail_positions = links_positions[:, 7, :]
 
-    plt.figure()
     plot_trajectory(head_positions)
 
     osc_phases = data.state.phases()
@@ -68,6 +68,7 @@ def exercise_8d1(timestep,duration):
 
     plt.figure()
     plt.plot(times, joint_angles + np.arange(8))
+    plt.show()
 
 
 
@@ -85,7 +86,8 @@ def exercise_8d2(timestep,duration):
             spawn_position=[0, 0, 0.1],  # Robot position in [m]
             spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
             drive=4,  # An example of parameter part of the grid search
-            amplitudes=[1, 2, 3],  # Just an example
+            #amplitudes=[1, 2, 3], 
+            amplitude_gradient = None, # Just an example
             phase_lag_body=-((2*np.pi)/8),  # or np.zeros(n_joints) for example
             turn=0,  # Another example
             # ...
@@ -120,7 +122,6 @@ def exercise_8d2(timestep,duration):
     head_positions = links_positions[:, 0, :]
     tail_positions = links_positions[:, 7, :]
 
-    plt.figure()
     plot_trajectory(head_positions)
 
     osc_phases = data.state.phases()
@@ -129,8 +130,9 @@ def exercise_8d2(timestep,duration):
     joint_angles=np.zeros((len(times),8))
     joint_angles[:,:] = osc_amplitudes[:,:8]*(1+np.cos(osc_phases[:,:8])) - osc_amplitudes[:,8:16]*(1+np.cos(osc_phases[:,8:16]))
 
-    plt.figure()
+    plt.figure(2)
     plt.plot(times, joint_angles+np.arange(8))
+    plt.show()
 
 
 

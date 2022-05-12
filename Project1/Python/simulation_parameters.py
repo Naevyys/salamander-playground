@@ -13,7 +13,8 @@ class SimulationParameters:
         self.duration = 30
         self.initial_phases = None
         self.phase_lag_body = ((2*np.pi)/8)
-        self.colat_weight=10
+        self.contra_coupling_weight=10
+        self.updown_coupling_weight=10
         self.amplitude_gradient = None
         self.amplitude_scaling = 1
         self.amplitude_gradient_scaling = False
