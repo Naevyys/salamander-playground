@@ -119,6 +119,7 @@ def exercise_8b(timestep):
     coordinates_energy = convert_nd_matrix_to_nd_plot_coordinates(energies, x_vals=amplitude_vals, y_vals=phase_lag_vals)
     coordinates_wavelengths = convert_nd_matrix_to_nd_plot_coordinates(salamander_wavelength, x_vals=amplitude_vals, y_vals=phase_lag_vals)
 
+    # Plot velocity, energy and wavelength as a function of amplitude and phase lag
     plt.figure('8b_Amplitude_Phase_Velocity')
     plot_2d(coordinates_velocities, ("Amplitude [a.u.]", "Phase [rad]", "Velocity [m/s]"), plot=False)
     plt.show()
@@ -127,6 +128,12 @@ def exercise_8b(timestep):
     plt.show()
     plt.figure('8b_Amplitude_Phase_Wavelength')
     plot_2d(coordinates_wavelengths, ("Amplitude [a.u.]", "Phase [rad]", "Wavelength [m]"), plot=False)
+    plt.show()
+
+    # Plot wavelength as a function of velocity and energy
+    coordinates = np.stack([matrix.flatten() for matrix in [velocities, energies, salamander_wavelength]], axis=-1)
+    plt.figure('8b_Velocity_Energy_Wavelength')
+    plot_2d(coordinates, ("Velocity [m/s]", "Energy [J]", "Wavelength [m]"), plot=False)
     plt.show()
 
 
