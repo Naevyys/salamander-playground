@@ -18,8 +18,11 @@ def exercise_example(timestep):
             spawn_position=[0, 0, 0.1],  # Robot position in [m]
             spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
             drive= drive,  # An example of parameter part of the grid search
-            amplitudes=[50, 1],  # Just an example
-            #amplitudes = 20.0,
+            amplitude_scaling=1,  # Just an example
+            updown_coupling_weight = 0, 
+            amplitude_gradient = None,
+            #amplitude_gradient = [0.5,2],
+            #amplitude_gradient_scaling = True,
             phase_lag_body= 2*np.pi/8,  # or np.zeros(n_joints) for example
             turn=0,  # Another example
             # ...

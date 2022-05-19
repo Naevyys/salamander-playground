@@ -46,6 +46,7 @@ def network_ode(_time, state, robot_parameters):
     return np.concatenate([dtheta, dr])
 
 
+
 def motor_output(phases, amplitudes, iteration):
     """Motor output
 
