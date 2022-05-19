@@ -132,4 +132,4 @@ dmypy.json
 **/.idea/
 
 # example log files
-./Project1/Python/logs/example
+./Project1/Python/logs
