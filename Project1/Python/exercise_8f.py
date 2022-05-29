@@ -9,10 +9,12 @@ from plot_results import plot_2d, plt
 
 
 # Helper functions
-def compute_velocity(pos, start_time=400, end_time=-1):
+def compute_velocity(pos, start_time=-100, end_time=-1):
 
     if end_time == -1:
         end_time = pos.shape[0] - 1
+    if start_time < 0:
+        start_time = pos.shape[0] + start_time
 
     pos_start = np.mean(pos[start_time], axis=0)
     pos_end = np.mean(pos[end_time], axis=0)
@@ -49,10 +51,10 @@ def exercise_8f(timestep):
     """Exercise 8f"""
 
     # Grid search parameters
-    coupling_weight_n_vals = 6
-    feedback_weight_n_vals = 6
+    coupling_weight_n_vals = 10
+    feedback_weight_n_vals = 10
     coupling_weight_vals = np.linspace(0, 5, num=coupling_weight_n_vals)
-    feedback_weight_vals = np.linspace(2, 5, num=feedback_weight_n_vals)
+    feedback_weight_vals = np.linspace(0, 5, num=feedback_weight_n_vals)
 
     duration = 10
 
@@ -70,7 +72,7 @@ def exercise_8f(timestep):
             turn=0,
             updown_coupling_weight=coupling_weight,  # Different coupling weights
             feedback_weight=feedback_weight,  # Different feedback weights
-            initial_phases=np.array([(20-n)*(2*np.pi)/20 for n in np.arange(20)]),
+            initial_phases=np.concatenate([np.array([(16-n)*(2*np.pi)/16 for n in np.arange(16)]), np.zeros(4)]),
         )
         for coupling_weight in coupling_weight_vals
         for feedback_weight in feedback_weight_vals
@@ -115,11 +117,11 @@ def exercise_8f(timestep):
                                                                   y_vals=feedback_weight_vals)
 
     # Plot velocity, energy and wavelength as a function of amplitude and phase lag
-    plt.figure('8f_Amplitude_Phase_Velocity')
-    plot_2d(coordinates_velocities, ("Amplitude [a.u.]", "Phase [rad]", "Velocity [m/s]"), plot=False)
+    plt.figure('8f_Coupling_Feedback_Velocity')
+    plot_2d(coordinates_velocities, ("Coupling weight [a.u.]", "Feedback weight [a.u.]", "Velocity [m/s]"), plot=False)
     plt.show()
-    plt.figure('8f_Amplitude_Phase_Energy')
-    plot_2d(coordinates_energy, ("Amplitude [a.u.]", "Phase [rad]", "Energy [J]"), plot=False)
+    plt.figure('8f_Coupling_Feedback_Energy')
+    plot_2d(coordinates_energy, ("Coupling weight [a.u.]", "Feedback weight [a.u.]", "Energy [J]"), plot=False)
     plt.show()
 
 
