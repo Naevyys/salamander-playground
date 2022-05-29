@@ -144,7 +144,7 @@ def exercise_8d2(timestep,duration):
     ]
 
     # Grid search
-    directory = './logs/exercise8b'
+    directory = './logs/exercise8d2'
     os.makedirs(directory, exist_ok=True)
     for f in os.listdir(directory):
         os.remove(os.path.join(directory, f))  # Delete all existing files before running the new simulations
@@ -178,13 +178,12 @@ def exercise_8d2(timestep,duration):
     joint_angles=np.zeros((len(times),8))
     joint_angles[:,:] = osc_amplitudes[:,:8]*(1+np.cos(osc_phases[:,:8])) - osc_amplitudes[:,8:16]*(1+np.cos(osc_phases[:,8:16]))
 
+    ob = AnchoredHScaleBar(size=np.pi / (3*5), label=r"$\pi$/3", loc=2, frameon=False,
+                           pad=1, sep=4, linekw=dict(color="black"), )
+
     fig = plt.figure()
     ax = fig.gca()
     ax.plot(times, joint_angles-np.arange(8))
-
-    ob = AnchoredHScaleBar(size=np.pi/3, label=r"$\pi$/3", loc=2, frameon=False,
-                           pad=1, sep=4, linekw=dict(color="black"), )
-
     ax.legend([r'$q_1$',r'$q_2$',r'$q_3$',r'$q_4$',r'$q_5$',r'$q_6$',r'$q_7$',r'$q_8$'],loc="lower right")
     ax.add_artist(ob)
     ax.set_yticks([])
@@ -192,6 +191,7 @@ def exercise_8d2(timestep,duration):
     ax.set_xlabel('Time [s]')
 
     plt.savefig('8d2_jointangles.pdf', bbox_inches='tight')
+    plt.show()
 
 
 
