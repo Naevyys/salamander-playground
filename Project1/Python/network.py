@@ -38,7 +38,9 @@ def network_ode(_time, state, robot_parameters, loads = np.zeros(12)):
 
     # Implement equation here
     phases_repeated=np.tile(phases,(len(phases),1))
-    reshape_loads = np.concatenate((loads[:robot_parameters.n_body_joints],loads[:robot_parameters.n_body_joints],loads[robot_parameters.n_body_joints:]))
+    #reshape_loads = np.concatenate((loads[:robot_parameters.n_body_joints],loads[:robot_parameters.n_body_joints],loads[robot_parameters.n_body_joints:]))
+    reshape_loads = np.concatenate((-loads[:robot_parameters.n_body_joints],loads[:robot_parameters.n_body_joints],loads[robot_parameters.n_body_joints:]))
+    #reshape_loads = np.concatenate((loads[:robot_parameters.n_body_joints],loads[robot_parameters.n_body_joints:],loads[robot_parameters.n_body_joints:],loads[robot_parameters.n_body_joints:]))
 
     dtheta=2*pi*freqs+np.sum(amplitudes*weights*np.sin(phases-phases_repeated.T-phase_bias),axis=1) + robot_parameters.feedback_weight*reshape_loads*np.cos(phases)
     dr=rates*(nominal_amplitudes-amplitudes)
