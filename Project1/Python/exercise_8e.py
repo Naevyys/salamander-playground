@@ -29,15 +29,59 @@ def compute_energy(joint_torque, joint_velocities):
 def exercise_8e1(timestep,duration):
     """Exercise 8e1"""
 
-    #i_ph = np.array([(20-n)*(2*np.pi)/20 for n in np.arange(20)])
-    #i_ph = np.array([(n+1)*(2*np.pi)/20 for n in np.arange(20)])
-    
-    #i_ph_h = np.array([(16-n)*(2*np.pi)/16 for n in np.arange(16)])
-    #i_ph = np.concatenate((i_ph_h,np.zeros(4)))
+    times = np.arange(0, duration, timestep)
 
-    i_ph_h = np.array([(8-n)*(2*np.pi)/8 for n in np.arange(8)])
-    i_ph = np.concatenate((i_ph_h,i_ph_h,np.zeros(4)))
+    parameter_set = [
+        SimulationParameters(
+            duration=duration,  # Simulation duration in [s]
+            timestep=timestep,  # Simulation timestep in [s]
+            spawn_position=[0, 0, 0.1],  # Robot position in [m]
+            spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
+            drive=4,  # An example of parameter part of the grid search
+            updown_coupling_weight = 0, 
+            #amplitude_scaling = 2,
+            amplitude_gradient = None,  # Just an example
+            phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
+        )
+    ]
 
+    # Grid search
+    directory = './logs/exercise8e1'
+    os.makedirs(directory, exist_ok=True)
+    for f in os.listdir(directory):
+        os.remove(os.path.join(directory, f))  # Delete all existing files before running the new simulations
+    for simulation_i, sim_parameters in enumerate(parameter_set):
+        filename = './logs/exercise8e1/simulation_{}.{}'
+        sim, data = simulation(
+            sim_parameters=sim_parameters,  # Simulation parameters, see above
+            arena='water',  # Can also be 'ground', give it a try!
+            # fast=True,  # For fast mode (not real-time)
+            # headless=True,  # For headless mode (No GUI, could be faster)
+            # record=True,  # Record video
+        )
+        # Log robot data
+        data.to_file(filename.format(simulation_i, 'h5'), sim.iteration)
+        # Log simulation parameters
+        with open(filename.format(simulation_i, 'pickle'), 'wb') as param_file:
+            pickle.dump(sim_parameters, param_file)
+
+    links_positions = data.sensors.links.urdf_positions()
+    joints_velocities = data.sensors.joints.velocities_all()
+    joints_torques = data.sensors.joints.motor_torques_all()
+
+    head_positions = links_positions[:, 0, :]
+    tail_positions = links_positions[:, 7, :]
+
+    plot_trajectory(head_positions)
+    plot_positions(times, head_positions)
+    print(compute_velocity(links_positions))
+    print(compute_energy(joints_torques, joints_velocities))
+
+
+
+    k = 16
+    i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
+    i_ph = np.concatenate((i_ph_h,np.zeros(4)))
 
     times = np.arange(0, duration, timestep)
 
@@ -90,15 +134,14 @@ def exercise_8e1(timestep,duration):
 
 
 
+
 def exercise_8e2(timestep,duration):
     """Exercise 8e2"""
 
     times = np.arange(0, duration, timestep)
 
     "PART 1: Model with hydrodynamic forces"
-
     '''
-
     parameter_set = [
         SimulationParameters(
             duration=duration,  # Simulation duration in [s]
@@ -145,12 +188,9 @@ def exercise_8e2(timestep,duration):
     plot_positions(times, head_positions)
     print(compute_velocity(links_positions))
     print(compute_energy(joints_torques, joints_velocities))
-
     '''
 
-
-
-    "PART 2: Model with initial phases - identification of the correct behavior"
+    "PART 3: Model with correct initial phases + changing wbf"
 
     #i_ph_h = np.array([(2*np.pi)/8, (2*np.pi)*2/8, (2*np.pi)*3/8, (2*np.pi)*4/8, (2*np.pi)*5/8, (2*np.pi)*6/8, (2*np.pi)*7/8, 0 ])
     #i_ph = np.concatenate((i_ph_h,i_ph_h,np.zeros(4)))
@@ -170,7 +210,9 @@ def exercise_8e2(timestep,duration):
     #i_ph = np.concatenate((i_ph_h,8*i_ph_h,np.zeros(4)))
 
     #i_ph = np.array([(20-n)*(2*np.pi)/20 for n in np.arange(20)])
-    i_ph_h = np.array([(16-n)*(2*np.pi)/16 for n in np.arange(16)])
+
+    k = 16
+    i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
     i_ph = np.concatenate((i_ph_h,np.zeros(4)))
 
     '''
@@ -197,15 +239,70 @@ def exercise_8e2(timestep,duration):
             drive=4,  # An example of parameter part of the grid search
             updown_coupling_weight = 0, 
             feedback_weight = 2,
-            #feedback_weight = wfb,
             initial_phases = i_ph, 
             amplitude_gradient = None,  # Just an example
             phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
         ) 
-        #for wfb in np.linspace(0,10,5)
     ]
 
+
+        # Grid search
+    directory = './logs/exercise8e2'
+    os.makedirs(directory, exist_ok=True)
+    for f in os.listdir(directory):
+        os.remove(os.path.join(directory, f))  # Delete all existing files before running the new simulations
+    for simulation_i, sim_parameters in enumerate(parameter_set):
+        filename = './logs/exercise8e2/simulation_{}.{}'
+        sim, data = simulation(
+            sim_parameters=sim_parameters,  # Simulation parameters, see above
+            arena='water',  # Can also be 'ground', give it a try!
+            fast=True,  # For fast mode (not real-time)
+            headless=True,  # For headless mode (No GUI, could be faster)
+            # record=True,  # Record video
+        )
+        # Log robot data
+        data.to_file(filename.format(simulation_i, 'h5'), sim.iteration)
+        # Log simulation parameters
+        with open(filename.format(simulation_i, 'pickle'), 'wb') as param_file:
+            pickle.dump(sim_parameters, param_file)
+
+    links_positions = data.sensors.links.urdf_positions()
+    joints_velocities = data.sensors.joints.velocities_all()
+    joints_torques = data.sensors.joints.motor_torques_all()
+
+    head_positions = links_positions[:, 0, :]
+    tail_positions = links_positions[:, 7, :]
+
+    plot_trajectory(head_positions)
+    plot_positions(times, head_positions)
+    print(compute_velocity(links_positions))
+    print(compute_energy(joints_torques, joints_velocities))
+
+
+    "PART 3: Model with correct initial phases + changing wbf"
+
+    k = 16
+    i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
+    i_ph = np.concatenate((i_ph_h,np.zeros(4)))
+
     
+    parameter_set = [
+        SimulationParameters(
+            duration=duration,  # Simulation duration in [s]
+            timestep=timestep,  # Simulation timestep in [s]
+            spawn_position=[0, 0, 0.1],  # Robot position in [m]
+            spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
+            drive=4,  # An example of parameter part of the grid search
+            updown_coupling_weight = 0, 
+            feedback_weight = wfb,
+            initial_phases = i_ph, 
+            amplitude_gradient = None,  # Just an example
+            phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
+        ) 
+        for wfb in np.linspace(0,10,5)
+    ]
+
+
     velocities = np.zeros(5)
     energies = np.zeros(5)
 
@@ -219,8 +316,8 @@ def exercise_8e2(timestep,duration):
         sim, data = simulation(
             sim_parameters=sim_parameters,  # Simulation parameters, see above
             arena='water',  # Can also be 'ground', give it a try!
-            #fast=True,  # For fast mode (not real-time)
-            #headless=True,  # For headless mode (No GUI, could be faster)
+            fast=True,  # For fast mode (not real-time)
+            headless=True,  # For headless mode (No GUI, could be faster)
             # record=True,  # Record video
         )
         # Log robot data
@@ -238,10 +335,11 @@ def exercise_8e2(timestep,duration):
 
     print(velocities)
     print(energies)
+    print(np.linspace(0,5,5))
     
 
 
-    '''PART 3: Model comparison: open and closed loop
+    '''PART 4: Model comparison: open and closed loop
     REMARK: slose loop achieves the same speed (if not better) but using much lower energy !
 
     parameter_set = [
@@ -299,5 +397,5 @@ def exercise_8e2(timestep,duration):
 
 
 if __name__ == '__main__':
-    exercise_8e1(timestep=1e-2,duration=10)
+    #exercise_8e1(timestep=1e-2,duration=10)
     exercise_8e2(timestep=1e-2,duration=10)
