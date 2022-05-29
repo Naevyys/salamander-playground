@@ -165,10 +165,10 @@ class RobotParameters(dict):
         for i in np.arange(self.n_oscillators_body): 
                 if (1.0 <= parameters.drive_mlr[i] <= 5.0):
                     if parameters.amplitude_gradient is None : 
-                        self.nominal_amplitudes[i] =  parameters.amplitude_scaling*0.065*parameters.drive_mlr[i] + 0.196
+                        self.nominal_amplitudes[i] =  parameters.amplitude_scaling*(0.065*parameters.drive_mlr[i] + 0.196)
 
                     elif (parameters.amplitude_gradient_scaling == True):
-                        self.nominal_amplitudes[i] =  parameters.amplitude_gradient[i]*0.065*parameters.drive_mlr[i] + 0.196
+                        self.nominal_amplitudes[i] =  parameters.amplitude_gradient[i]*(0.065*parameters.drive_mlr[i] + 0.196)
 
                     else: 
                         self.nominal_amplitudes[i] =  parameters.amplitude_gradient[i]
