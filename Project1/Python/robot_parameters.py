@@ -28,7 +28,8 @@ class RobotParameters(dict):
         self.phase_bias = np.zeros([self.n_oscillators, self.n_oscillators])
         self.rates = np.zeros(self.n_oscillators)
         self.nominal_amplitudes = np.zeros(self.n_oscillators)
-        self.phase_lag_body = parameters.phase_lag_body
+        self.feedback_weight = parameters.feedback_weight
+        #self.phase_lag_body = parameters.phase_lag_body
         #self.amplitude_scaling = parameters.amplitude_scaling
         #self.amplitude_gradient = parameters.amplitude_gradient
         #self.amplitude_gradient_scaling = parameters.amplitude_gradient_scaling
@@ -119,9 +120,9 @@ class RobotParameters(dict):
 
             #upward and downward links
             if ((not (i == 0)) and (not (i == 8)) and (i < 16)):  #downward link
-                self.phase_bias[i,i-1] = self.phase_lag_body
+                self.phase_bias[i,i-1] = parameters.phase_lag_body
             if ((not (i == 7)) and (not(i == 15)) and (i < 16)):  #upward link
-                self.phase_bias[i,i+1] = - self.phase_lag_body
+                self.phase_bias[i,i+1] = - parameters.phase_lag_body
 
             # colateral links
             if (i < 8):

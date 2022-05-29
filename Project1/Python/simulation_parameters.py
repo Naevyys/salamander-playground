@@ -11,13 +11,14 @@ class SimulationParameters:
         self.n_body_joints = 8
         self.n_legs_joints = 4
         self.duration = 30
-        self.initial_phases = None
+        self.initial_phases = None                #vector of size 20
         self.phase_lag_body = ((2*np.pi)/8)
         self.contra_coupling_weight=10
         self.updown_coupling_weight=10
         self.amplitude_gradient = None
         self.amplitude_scaling = 1
         self.amplitude_gradient_scaling = False
+        self.feedback_weight = 0
         # Feel free to add more parameters (ex: MLR drive)
         self.drive = 0
         self.turn = 0

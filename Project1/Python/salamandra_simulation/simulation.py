@@ -119,4 +119,3 @@ def simulation(
         pylog.set_level('debug')
 
     return sim, animat_data
-

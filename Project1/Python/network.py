@@ -6,7 +6,7 @@ from robot_parameters import RobotParameters
 from math import *
 
 
-def network_ode(_time, state, robot_parameters):
+def network_ode(_time, state, robot_parameters, loads = np.zeros(12)):
     """Network_ODE
 
     Parameters
@@ -38,9 +38,9 @@ def network_ode(_time, state, robot_parameters):
 
     # Implement equation here
     phases_repeated=np.tile(phases,(len(phases),1))
+    reshape_loads = np.concatenate((loads[:robot_parameters.n_body_joints],loads[:robot_parameters.n_body_joints],loads[robot_parameters.n_body_joints:]))
 
-    dtheta=2*pi*freqs+np.sum(amplitudes*weights*np.sin(phases-phases_repeated.T-phase_bias),axis=1)
-
+    dtheta=2*pi*freqs+np.sum(amplitudes*weights*np.sin(phases-phases_repeated.T-phase_bias),axis=1) + robot_parameters.feedback_weight*reshape_loads*np.cos(phases)
     dr=rates*(nominal_amplitudes-amplitudes)
 
     return np.concatenate([dtheta, dr])
@@ -120,11 +120,20 @@ class SalamandraNetwork:
         # Parameters
         self.robot_parameters = RobotParameters(sim_parameters)
         # Set initial state
-        # Replace your oscillator phases here
-        self.state.set_phases(
-            iteration=0,
-            value=1e-4*np.random.ranf(self.robot_parameters.n_oscillators),
-        )
+
+        # Replace your oscillator phases here 
+        
+        if sim_parameters.initial_phases is not None: 
+            self.state.set_phases(
+                iteration=0,
+                value=sim_parameters.initial_phases,
+            )
+        else: 
+            self.state.set_phases(
+                iteration=0,
+                value=1e-4*np.random.ranf(self.robot_parameters.n_oscillators),
+            )
+
         # Set solver
         self.solver = ode(f=network_ode)
         self.solver.set_integrator('dopri5')
@@ -132,10 +141,11 @@ class SalamandraNetwork:
 
     def step(self, iteration, time, timestep, loads):
         """Step"""
+
         if iteration + 1 >= self.n_iterations:
             return
-        self.solver.set_f_params(self.robot_parameters)
-        self.state.array[iteration+1, :] = self.solver.integrate(time+timestep)
+        self.solver.set_f_params(self.robot_parameters, loads)
+        self.state.array[iteration+1, :] = self.solver.integrate(time+timestep)  
 
     def outputs(self, iteration=None):
         """Oscillator outputs"""
