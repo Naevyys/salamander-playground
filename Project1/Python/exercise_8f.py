@@ -53,7 +53,7 @@ def exercise_8f(timestep):
     # Grid search parameters
     coupling_weight_n_vals = 10
     feedback_weight_n_vals = 10
-    coupling_weight_vals = np.linspace(0, 5, num=coupling_weight_n_vals)
+    coupling_weight_vals = np.linspace(0, 10, num=coupling_weight_n_vals)
     feedback_weight_vals = np.linspace(0, 5, num=feedback_weight_n_vals)
 
     duration = 10
@@ -72,7 +72,7 @@ def exercise_8f(timestep):
             turn=0,
             updown_coupling_weight=coupling_weight,  # Different coupling weights
             feedback_weight=feedback_weight,  # Different feedback weights
-            initial_phases=np.concatenate([np.array([(16-n)*(2*np.pi)/16 for n in np.arange(16)]), np.zeros(4)]),
+            initial_phases=None, #np.concatenate([np.array([(16-n)*(2*np.pi)/16 for n in np.arange(16)]), np.zeros(4)]),
         )
         for coupling_weight in coupling_weight_vals
         for feedback_weight in feedback_weight_vals
