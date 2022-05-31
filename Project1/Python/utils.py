@@ -37,3 +37,9 @@ def convert_nd_matrix_to_nd_plot_coordinates(m, x_vals=None, y_vals=None):
         coordinates[i, len(m.shape)] = m[c]
 
     return coordinates
+
+def compute_salamander_wavelength(head_pos, tail_pos, start_time=400, end_time=-1):
+    """Measure wavelength of the salamander with the mean over the distance btw head and tail (body makes one wave)"""
+    head_pos = np.array(head_pos)
+    tail_pos = np.array(tail_pos)
+    return np.mean(np.sqrt(np.sum(np.square(head_pos[start_time:end_time] - tail_pos[start_time:end_time]), axis=1)))

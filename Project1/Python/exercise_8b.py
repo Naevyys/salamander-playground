@@ -5,15 +5,8 @@ import pickle
 import numpy as np
 from salamandra_simulation.simulation import simulation
 from simulation_parameters import SimulationParameters
-from plot_results import plot_2d, plt, plot_1d
-from utils import compute_energy, compute_velocity, convert_nd_matrix_to_nd_plot_coordinates
-
-
-def compute_salamander_wavelength(head_pos, tail_pos, start_time=400, end_time=-1):
-    """Measure wavelength of the salamander with the mean over the distance btw head and tail (body makes one wave)"""
-    head_pos = np.array(head_pos)
-    tail_pos = np.array(tail_pos)
-    return np.mean(np.sqrt(np.sum(np.square(head_pos[start_time:end_time] - tail_pos[start_time:end_time]), axis=1)))
+from plot_results import plot_2d, plt
+from utils import compute_energy, compute_velocity, convert_nd_matrix_to_nd_plot_coordinates, compute_salamander_wavelength
 
 
 def exercise_8b(timestep):
