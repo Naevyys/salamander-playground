@@ -6,22 +6,7 @@ import numpy as np
 from salamandra_simulation.simulation import simulation
 from simulation_parameters import SimulationParameters
 import matplotlib.pyplot as plt
-from matplotlib.transforms import offset_copy
-
-def compute_velocity(pos, start_time=-100, end_time=-1):
-
-    if end_time == -1:
-        end_time = pos.shape[0] - 1
-    if start_time < 0:
-        start_time = pos.shape[0] + start_time
-
-    pos_start = np.mean(pos[start_time], axis=0)
-    pos_end = np.mean(pos[end_time], axis=0)
-
-    distance = np.sqrt(np.sum(np.square(pos_end - pos_start)))
-    delta_time = end_time - start_time
-
-    return distance / delta_time
+from utils import compute_velocity
 
 def num_pieces(num,length): # With inspiration from: https://stackoverflow.com/questions/53494200/how-to-split-a-number-into-12-random-in-python-and-all-random-number-sum-to-be-e
     all_list = []
