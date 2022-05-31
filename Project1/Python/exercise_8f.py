@@ -6,42 +6,7 @@ import numpy as np
 from salamandra_simulation.simulation import simulation
 from simulation_parameters import SimulationParameters
 from plot_results import plot_2d, plt
-
-
-# Helper functions
-def compute_velocity(pos, start_time=400, end_time=-1):
-
-    if end_time == -1:
-        end_time = pos.shape[0] - 1
-
-    pos_start = np.mean(pos[start_time], axis=0)
-    pos_end = np.mean(pos[end_time], axis=0)
-
-    distance = np.sqrt(np.sum(np.square(pos_end - pos_start)))
-    delta_time = end_time - start_time
-
-    return distance / delta_time
-
-
-def compute_energy(joint_torque, joint_velocities):
-    return np.sum(np.multiply(joint_torque, joint_velocities))
-
-
-def convert_nd_matrix_to_nd_plot_coordinates(m, x_vals=None, y_vals=None):
-
-    coordinates = np.zeros((np.prod(m.shape), len(m.shape) + 1))
-    for i, c in enumerate(np.ndindex(m.shape)):
-        if x_vals is not None:
-            coordinates[i, 0] = x_vals[c[0]]
-        else:
-            coordinates[i, 0] = c[0]
-        if len(c) > 1 and y_vals is not None:
-            coordinates[i, 1] = y_vals[c[1]]
-        elif len(c) > 1:
-            coordinates[i, 1] = c[1]
-        coordinates[i, len(m.shape)] = m[c]
-
-    return coordinates
+from utils import compute_energy, compute_velocity, convert_nd_matrix_to_nd_plot_coordinates
 
 
 # Exercise
@@ -49,10 +14,10 @@ def exercise_8f(timestep):
     """Exercise 8f"""
 
     # Grid search parameters
-    coupling_weight_n_vals = 6
-    feedback_weight_n_vals = 6
-    coupling_weight_vals = np.linspace(0, 5, num=coupling_weight_n_vals)
-    feedback_weight_vals = np.linspace(2, 5, num=feedback_weight_n_vals)
+    coupling_weight_n_vals = 10
+    feedback_weight_n_vals = 10
+    coupling_weight_vals = np.linspace(0, 10, num=coupling_weight_n_vals)
+    feedback_weight_vals = np.linspace(0, 5, num=feedback_weight_n_vals)
 
     duration = 10
 
@@ -70,7 +35,7 @@ def exercise_8f(timestep):
             turn=0,
             updown_coupling_weight=coupling_weight,  # Different coupling weights
             feedback_weight=feedback_weight,  # Different feedback weights
-            initial_phases=np.array([(20-n)*(2*np.pi)/20 for n in np.arange(20)]),
+            initial_phases=None, #np.concatenate([np.array([(16-n)*(2*np.pi)/16 for n in np.arange(16)]), np.zeros(4)]),
         )
         for coupling_weight in coupling_weight_vals
         for feedback_weight in feedback_weight_vals
@@ -115,11 +80,11 @@ def exercise_8f(timestep):
                                                                   y_vals=feedback_weight_vals)
 
     # Plot velocity, energy and wavelength as a function of amplitude and phase lag
-    plt.figure('8f_Amplitude_Phase_Velocity')
-    plot_2d(coordinates_velocities, ("Amplitude [a.u.]", "Phase [rad]", "Velocity [m/s]"), plot=False)
+    plt.figure('8f_Coupling_Feedback_Velocity')
+    plot_2d(coordinates_velocities, ("Coupling weight [a.u.]", "Feedback weight [a.u.]", "Velocity [m/s]"), plot=False)
     plt.show()
-    plt.figure('8f_Amplitude_Phase_Energy')
-    plot_2d(coordinates_energy, ("Amplitude [a.u.]", "Phase [rad]", "Energy [J]"), plot=False)
+    plt.figure('8f_Coupling_Feedback_Energy')
+    plot_2d(coordinates_energy, ("Coupling weight [a.u.]", "Feedback weight [a.u.]", "Energy [J]"), plot=False)
     plt.show()
 
 
