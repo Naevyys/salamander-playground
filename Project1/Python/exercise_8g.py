@@ -8,9 +8,9 @@ from simulation_parameters import SimulationParameters
 import matplotlib.pyplot as plt
 from utils import compute_velocity
 
-def num_pieces(num,length): # With inspiration from: https://stackoverflow.com/questions/53494200/how-to-split-a-number-into-12-random-in-python-and-all-random-number-sum-to-be-e
+def num_pieces(num,length,seed): # With inspiration from: https://stackoverflow.com/questions/53494200/how-to-split-a-number-into-12-random-in-python-and-all-random-number-sum-to-be-e
     all_list = []
-    np.random.seed(seed=42)
+    np.random.seed(seed=seed)
     for i in range(length-1):
         n = np.random.randint(0, num+1)
         all_list.append(n)
@@ -24,8 +24,10 @@ max_disruptions=9
 
 
 
-def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_weight=10, plot_column=None, set_seed=True, randseed=42):
+def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_weight=10, plot_column=None, set_seed=True):
     """Exercise 8g"""
+
+    rng = np.random.default_rng(seed=42)
 
     times = np.arange(0, duration, timestep)
 
@@ -48,7 +50,7 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
             updown_coupling_weight=updown_coupling_weight,
             feedback_weight=feedback_weight,
             turn=0,  # Another example
-            randseed=randseed,
+            randseed=rng.integers(123456789),
             set_seed=set_seed,
             n_disruption_couplings=n_disruption_couplings,  # Scalar between 0 and 7
             n_disruption_oscillators=0,  # Scalar between 0 and 8
@@ -85,7 +87,9 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
 
     velocities_reshaped = velocities[:-1 * repetitions].reshape(max_disruptions - 1, repetitions)
 
-    axes[0,plot_column].errorbar(np.arange(max_disruptions - 1), np.mean(velocities_reshaped, axis=1),
+    print(velocities_reshaped)
+
+    axes[1,plot_column].errorbar(np.arange(max_disruptions - 1), np.mean(velocities_reshaped, axis=1),
                  yerr=np.std(velocities_reshaped, axis=1), fmt='-o')
 
 
@@ -107,7 +111,7 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
             updown_coupling_weight=updown_coupling_weight,
             feedback_weight=feedback_weight,
             turn=0,  # Another example
-            randseed=randseed,
+            randseed=rng.integers(123456789),
             set_seed=set_seed,
             n_disruption_couplings=0,  # Scalar between 0 and 7
             n_disruption_oscillators=n_disruption_oscillators,  # Scalar between 0 and 8
@@ -144,7 +148,9 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
 
     velocities_reshaped = velocities.reshape(max_disruptions, repetitions)
 
-    axes[1,plot_column].errorbar(np.arange(max_disruptions), np.mean(velocities_reshaped, axis=1),
+    print(velocities_reshaped)
+
+    axes[2,plot_column].errorbar(np.arange(max_disruptions), np.mean(velocities_reshaped, axis=1),
                  yerr=np.std(velocities_reshaped, axis=1), fmt='-o')
 
 
@@ -166,7 +172,7 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
             updown_coupling_weight=updown_coupling_weight,
             feedback_weight=feedback_weight,
             turn=0,  # Another example
-            randseed=randseed,
+            randseed=rng.integers(123456789),
             set_seed=set_seed,
             n_disruption_couplings=0,  # Scalar between 0 and 7
             n_disruption_oscillators=0,  # Scalar between 0 and 8
@@ -203,7 +209,9 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
 
     velocities_reshaped = velocities.reshape(max_disruptions, repetitions)
 
-    axes[2,plot_column].errorbar(np.arange(max_disruptions), np.mean(velocities_reshaped, axis=1),
+    print(velocities_reshaped)
+
+    axes[0,plot_column].errorbar(np.arange(max_disruptions), np.mean(velocities_reshaped, axis=1),
                  yerr=np.std(velocities_reshaped, axis=1), fmt='-o')
 
     ##############
@@ -212,7 +220,7 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
 
     mixed_disruptions=np.zeros((max_disruptions-1,3))
     for i in range(max_disruptions-1):
-        mixed_disruptions[i, :] = num_pieces(i, 3)
+        mixed_disruptions[i, :] = num_pieces(i, 3,rng.integers(123456789))
 
     mixed_disruptions = mixed_disruptions.astype(int)
 
@@ -229,7 +237,7 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
             updown_coupling_weight=updown_coupling_weight,
             feedback_weight=feedback_weight,
             turn=0,  # Another example
-            randseed=randseed,
+            randseed=rng.integers(123456789),
             set_seed=set_seed,
             n_disruption_couplings=n_disruption_couplings,  # Scalar between 0 and 7
             n_disruption_oscillators=n_disruption_oscillators,  # Scalar between 0 and 8
@@ -268,6 +276,8 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
 
     velocities_reshaped = velocities[:-1 * repetitions].reshape(max_disruptions - 1, repetitions)
 
+    print(velocities_reshaped)
+
     axes[3,plot_column].errorbar(np.arange(max_disruptions - 1), np.mean(velocities_reshaped, axis=1),
                  yerr=np.std(velocities_reshaped, axis=1), fmt='-o')
 
@@ -301,7 +311,7 @@ fig.subplots_adjust(left=0.15, top=0.95)
 
 if __name__ == '__main__':
     # CPG only
-    exercise_8g(timestep=1e-2, duration=10, feedback_weight=0, updown_coupling_weight=10, plot_column=0)
+    exercise_8g(timestep=1e-2, duration=4, feedback_weight=0, updown_coupling_weight=10, plot_column=0)
     # Decoupled
     exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_weight=0, plot_column=1)
     # Combined
