@@ -285,38 +285,38 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
 ## Plot results ##
 ##################
 
-fig,axes=plt.subplots(4,3,sharex=True,sharey=True,figsize=(12,9))
-
-# Define y and x labels
-for i in range(4):
-    axes[i,0].set_ylabel('Speed [m/s]')
-for j in range(3):
-    axes[-1,j].set_xlabel('Number of neural disruptions')
-
-# Define and assign row and column labels: https://stackoverflow.com/questions/25812255/row-and-column-headers-in-matplotlibs-subplots
-cols = ['CPG only','Decoupled','Combined']
-rows = ['Muted\nsensors','Removed\ncouplings','Muted\noscillators','Mixed\ndisruptions']
-pad = 5 # in points
-for ax, col in zip(axes[0], cols):
-    ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
-                xycoords='axes fraction', textcoords='offset points',
-                size='large', ha='center', va='baseline')
-
-for ax, row in zip(axes[:,0], rows):
-    ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
-                xycoords=ax.yaxis.label, textcoords='offset points',
-                size='large', ha='right', va='center')
-fig.tight_layout()
-fig.subplots_adjust(left=0.15, top=0.95)
-
 if __name__ == '__main__':
+    fig,axes=plt.subplots(4,3,sharex=True,sharey=True,figsize=(12,9))
+
+    # Define y and x labels
+    for i in range(4):
+        axes[i,0].set_ylabel('Speed [m/s]')
+    for j in range(3):
+        axes[-1,j].set_xlabel('Number of neural disruptions')
+
+    # Define and assign row and column labels: https://stackoverflow.com/questions/25812255/row-and-column-headers-in-matplotlibs-subplots
+    cols = ['CPG only','Decoupled','Combined']
+    rows = ['Muted\nsensors','Removed\ncouplings','Muted\noscillators','Mixed\ndisruptions']
+    pad = 5 # in points
+    for ax, col in zip(axes[0], cols):
+        ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
+                    xycoords='axes fraction', textcoords='offset points',
+                    size='large', ha='center', va='baseline')
+
+    for ax, row in zip(axes[:,0], rows):
+        ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
+                    xycoords=ax.yaxis.label, textcoords='offset points',
+                    size='large', ha='right', va='center')
+    fig.tight_layout()
+    fig.subplots_adjust(left=0.15, top=0.95)
+
     # CPG only
-    exercise_8g(timestep=1e-2, duration=4, feedback_weight=0, updown_coupling_weight=10, plot_column=0)
+    exercise_8g(timestep=1e-2, duration=10, feedback_weight=0, updown_coupling_weight=10, plot_column=0)
     # Decoupled
     exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_weight=0, plot_column=1)
     # Combined
     exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_weight=10, plot_column=2)
 
-plt.show()
+    plt.show()
 
-plt.savefig('8g_disruptions.pdf', bbox_inches='tight')
+    plt.savefig('8g_disruptions.pdf', bbox_inches='tight')
