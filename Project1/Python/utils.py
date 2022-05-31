@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def compute_velocity(pos, start_time=-100, end_time=-1):
+def compute_velocity(pos, timestep=1e-2, start_time=-100, end_time=-1):
 
     if end_time == -1:
         end_time = pos.shape[0] - 1
@@ -12,7 +12,7 @@ def compute_velocity(pos, start_time=-100, end_time=-1):
     pos_end = np.mean(pos[end_time], axis=0)
 
     distance = np.sqrt(np.sum(np.square(pos_end - pos_start)))
-    delta_time = end_time - start_time
+    delta_time = (end_time - start_time) * timestep
 
     return distance / delta_time
 

@@ -71,7 +71,7 @@ def exercise_8f(timestep):
         amp_i = simulation_i // feedback_weight_n_vals
         phase_i = simulation_i % feedback_weight_n_vals
 
-        velocities[amp_i, phase_i] = compute_velocity(links_positions)
+        velocities[amp_i, phase_i] = compute_velocity(links_positions, timestep=timestep)
         energies[amp_i, phase_i] = compute_energy(joints_torques, joints_velocities)
 
     coordinates_velocities = convert_nd_matrix_to_nd_plot_coordinates(velocities, x_vals=coupling_weight_vals,

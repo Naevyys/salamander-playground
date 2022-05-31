@@ -70,7 +70,7 @@ def exercise_8b(timestep):
         amp_i = simulation_i // phase_n_vals
         phase_i = simulation_i % phase_n_vals
 
-        velocities[amp_i, phase_i] = compute_velocity(links_positions)
+        velocities[amp_i, phase_i] = compute_velocity(links_positions, timestep=timestep)
         energies[amp_i, phase_i] = compute_energy(joints_torques, joints_velocities)
         salamander_wavelength[amp_i, phase_i] = compute_salamander_wavelength(head_pos, tail_pos)
 
