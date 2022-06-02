@@ -68,6 +68,7 @@ def motor_output(phases, amplitudes, iteration):
     # Implement equation here
     q = np.zeros(12)
     q[:8] = amplitudes[:8]*(1+np.cos(phases[:8])) - amplitudes[8:16]*(1+np.cos(phases[8:16]))
+    q[8:] = phases[16:]
     return q
 
 

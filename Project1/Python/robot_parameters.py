@@ -28,12 +28,39 @@ class RobotParameters(dict):
         self.phase_bias = np.zeros([self.n_oscillators, self.n_oscillators])
         self.rates = np.zeros(self.n_oscillators)
         self.nominal_amplitudes = np.zeros(self.n_oscillators)
-        self.feedback_weight = parameters.feedback_weight
+
+        self.muted_sensors = np.ones(self.n_oscillators)
+        self.muted_couplings = np.ones([self.n_oscillators, self.n_oscillators])
+        self.muted_oscillators = np.ones(self.n_oscillators)
+
+        # Set random seed
+        if parameters.set_seed:
+            np.random.seed(seed=parameters.randseed)
+        else:
+            pass
+
+        affected_sensors_oneside = np.random.choice(8, size=parameters.n_disruption_sensors, replace=False)
+        affected_sensors = np.concatenate((affected_sensors_oneside,affected_sensors_oneside+8))
+        self.muted_sensors[affected_sensors] = 0
+
+        affected_couplings = np.random.choice(7, size=parameters.n_disruption_couplings, replace=False)
+        self.muted_couplings[affected_couplings, affected_couplings + 1] = 0
+        self.muted_couplings[affected_couplings + 1,affected_couplings] = 0
+        self.muted_couplings[affected_couplings + 8, affected_couplings + 9] = 0
+        self.muted_couplings[affected_couplings + 9, affected_couplings + 8] = 0
+
+        affected_oscillators_oneside = np.random.choice(8, size=parameters.n_disruption_oscillators, replace=False)
+        affected_oscillators = np.concatenate((affected_oscillators_oneside,affected_oscillators_oneside+8))
+        self.muted_oscillators[affected_oscillators] = 0
+
+        self.feedback_weight = parameters.feedback_weight*self.muted_sensors
+
         #self.phase_lag_body = parameters.phase_lag_body
         #self.amplitude_scaling = parameters.amplitude_scaling
         #self.amplitude_gradient = parameters.amplitude_gradient
         #self.amplitude_gradient_scaling = parameters.amplitude_gradient_scaling
         self.update(parameters)
+
 
     def update(self, parameters):
         """Update network from parameters"""
@@ -45,6 +72,7 @@ class RobotParameters(dict):
 
     def set_frequencies(self, parameters):
         """Set frequencies"""
+
 
         # Induce turning
         parameters.drive_mlr += np.concatenate((np.ones(8) * parameters.turn, -np.ones(8) * parameters.turn, np.zeros(4)))
@@ -59,6 +87,8 @@ class RobotParameters(dict):
                self.freqs[i] =  0.2*parameters.drive_mlr[i] + 0.0
             else: 
                 self.freqs[i] = 0.0
+
+        self.freqs *= self.muted_oscillators
 
         return
 
@@ -99,7 +129,7 @@ class RobotParameters(dict):
             if (12 <= i < 16):
                  self.coupling_weights[i,19] = 30
 
-
+        self.coupling_weights *= self.muted_couplings
         return
         
 
