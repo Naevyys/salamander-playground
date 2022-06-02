@@ -7,10 +7,12 @@ from salamandra_simulation.simulation import simulation
 from simulation_parameters import SimulationParameters
 from plot_results import plot_2d
 
-def compute_velocity(pos, start_time=400, end_time=-1):
+def compute_velocity(pos, start_time=-100, end_time=-1):
 
     if end_time == -1:
         end_time = pos.shape[0] - 1
+    if start_time < 0:
+        start_time = pos.shape[0] + start_time
 
     pos_start = np.mean(pos[start_time], axis=0)
     pos_end = np.mean(pos[end_time], axis=0)
@@ -19,7 +21,6 @@ def compute_velocity(pos, start_time=400, end_time=-1):
     delta_time = end_time - start_time
 
     return distance / delta_time
-
 
 def compute_energy(joint_torque, joint_velocities):
     return np.sum(np.multiply(joint_torque, joint_velocities))

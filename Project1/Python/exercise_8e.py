@@ -8,10 +8,12 @@ from simulation_parameters import SimulationParameters
 from plot_results import plot_trajectory, plot_positions
 import matplotlib.pyplot as plt
 
-def compute_velocity(pos, start_time=400, end_time=-1):
+def compute_velocity(pos, start_time=-100, end_time=-1):
 
     if end_time == -1:
         end_time = pos.shape[0] - 1
+    if start_time < 0:
+        start_time = pos.shape[0] + start_time
 
     pos_start = np.mean(pos[start_time], axis=0)
     pos_end = np.mean(pos[end_time], axis=0)
@@ -211,9 +213,9 @@ def exercise_8e2(timestep,duration):
 
     #i_ph = np.array([(20-n)*(2*np.pi)/20 for n in np.arange(20)])
 
-    k = 16
-    i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
-    i_ph = np.concatenate((i_ph_h,np.zeros(4)))
+    #k = 16
+    #i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
+    #i_ph = np.concatenate((i_ph_h,np.zeros(4)))
 
     '''
     Remarks so far: 
@@ -229,7 +231,7 @@ def exercise_8e2(timestep,duration):
     PROBLEM, IN FORUM IS SAID: the initialization of the phases should not affect the capability of the model to produce movement in general
     PROBLEM; THE change in weighth doesn't seem to change anything, just energy, no effect on speed ! so even with 0 feedback weights... ! 
     '''
-    
+    '''
     parameter_set = [
         SimulationParameters(
             duration=duration,  # Simulation duration in [s]
@@ -256,8 +258,8 @@ def exercise_8e2(timestep,duration):
         sim, data = simulation(
             sim_parameters=sim_parameters,  # Simulation parameters, see above
             arena='water',  # Can also be 'ground', give it a try!
-            fast=True,  # For fast mode (not real-time)
-            headless=True,  # For headless mode (No GUI, could be faster)
+            #fast=True,  # For fast mode (not real-time)
+            #headless=True,  # For headless mode (No GUI, could be faster)
             # record=True,  # Record video
         )
         # Log robot data
@@ -278,9 +280,11 @@ def exercise_8e2(timestep,duration):
     print(compute_velocity(links_positions))
     print(compute_energy(joints_torques, joints_velocities))
 
+    '''
+
 
     "PART 3: Model with correct initial phases + changing wbf"
-
+    '''
     k = 16
     i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
     i_ph = np.concatenate((i_ph_h,np.zeros(4)))
@@ -336,11 +340,16 @@ def exercise_8e2(timestep,duration):
     print(velocities)
     print(energies)
     print(np.linspace(0,5,5))
+    '''
+    
     
 
 
-    '''PART 4: Model comparison: open and closed loop
-    REMARK: slose loop achieves the same speed (if not better) but using much lower energy !
+    "PART 4: Model comparison: open and closed loop"
+    #REMARK: slose loop achieves the same speed (if not better) but using much lower energy !"
+    k = 16
+    i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
+    i_ph = np.concatenate((i_ph_h,np.zeros(4)))
 
     parameter_set = [
     SimulationParameters(
@@ -351,17 +360,18 @@ def exercise_8e2(timestep,duration):
         drive=4,  # An example of parameter part of the grid search
         updown_coupling_weight = udcw, 
         feedback_weight = wfb,
-        initial_phases = change, 
+        initial_phases = i_ph, 
         amplitude_gradient = None,  # Just an example
         phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
     )
 
-    for udcw, wfb, change in zip(np.array([10,0]),np.array([0,2]),np.array([i_ph,i_ph]))
-    #initial phases ??? changes from closed to open ? 
+    for udcw, wfb in zip(np.array([10,10,0]),np.array([0,2,2]))
+    #initial phases ??? changes from closed to open ?
     ]
 
-    velocities = np.zeros(2)
-    energies = np.zeros(2)
+
+    velocities = np.zeros(3)
+    energies = np.zeros(3)
 
 
         # Grid search
@@ -393,7 +403,6 @@ def exercise_8e2(timestep,duration):
         
     print(velocities)
     print(energies)
-    '''
 
 
 if __name__ == '__main__':
