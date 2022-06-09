@@ -81,14 +81,14 @@ def exercise_9b(timestep):
         plt.xlabel('Time [ms]')
         plt.ylabel('X GPS coordinate [m]')
         plt.title('X GPS coordinates over time')
-        plt.savefig('9b_X_GPS_coordinate.pdf')
+        plt.savefig('9b_X_GPS_coordinate_{}.pdf'.format(record_path))
         plt.show()
         plt.figure('9b_Joint_torques')
         plt.plot(joints_torques[:, :] + np.arange(joints_torques.shape[1]))
         plt.xlabel('Time [ms]')
         plt.ylabel('Joint torques [rad]')
         plt.title('Joint torques over time')
-        plt.savefig('9b_Joint_torques.pdf')
+        plt.savefig('9b_Joint_torques_{}.pdf'.format(record_path))
         plt.show()
 
 
