@@ -7,31 +7,15 @@ from salamandra_simulation.simulation import simulation
 from simulation_parameters import SimulationParameters
 from plot_results import plot_trajectory, plot_positions
 import matplotlib.pyplot as plt
-
-def compute_velocity(pos, start_time=-100, end_time=-1):
-
-    if end_time == -1:
-        end_time = pos.shape[0] - 1
-    if start_time < 0:
-        start_time = pos.shape[0] + start_time
-
-    pos_start = np.mean(pos[start_time], axis=0)
-    pos_end = np.mean(pos[end_time], axis=0)
-
-    distance = np.sqrt(np.sum(np.square(pos_end - pos_start)))
-    delta_time = end_time - start_time
-
-    return distance / delta_time
-
-
-def compute_energy(joint_torque, joint_velocities):
-    return np.sum(np.multiply(joint_torque, joint_velocities))
+from utils import compute_energy, compute_velocity
 
 
 def exercise_8e1(timestep,duration):
     """Exercise 8e1"""
 
     times = np.arange(0, duration, timestep)
+
+    '''Part 1: no initial state'''
 
     parameter_set = [
         SimulationParameters(
@@ -76,10 +60,10 @@ def exercise_8e1(timestep,duration):
 
     plot_trajectory(head_positions)
     plot_positions(times, head_positions)
-    print(compute_velocity(links_positions))
+    print(compute_velocity(links_positions, timestep= timestep))
     print(compute_energy(joints_torques, joints_velocities))
 
-
+    '''Part 2: initial state'''
 
     k = 16
     i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
@@ -131,7 +115,7 @@ def exercise_8e1(timestep,duration):
 
     plot_trajectory(head_positions)
     plot_positions(times, head_positions)
-    print(compute_velocity(links_positions))
+    print(compute_velocity(links_positions, timestep= timestep))
     print(compute_energy(joints_torques, joints_velocities))
 
 
@@ -188,7 +172,7 @@ def exercise_8e2(timestep,duration):
 
     plot_trajectory(head_positions)
     plot_positions(times, head_positions)
-    print(compute_velocity(links_positions))
+    print(compute_velocity(links_positions, timestep = timestep))
     print(compute_energy(joints_torques, joints_velocities))
     '''
 
@@ -277,17 +261,17 @@ def exercise_8e2(timestep,duration):
 
     plot_trajectory(head_positions)
     plot_positions(times, head_positions)
-    print(compute_velocity(links_positions))
+    print(compute_velocity(links_positions, timestep = timestep))
     print(compute_energy(joints_torques, joints_velocities))
 
     '''
 
 
     "PART 3: Model with correct initial phases + changing wbf"
-    '''
-    k = 16
-    i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
-    i_ph = np.concatenate((i_ph_h,np.zeros(4)))
+    #k = 16
+    #i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
+    #i_ph = np.concatenate((i_ph_h,np.zeros(4)))
+    j = 10
 
     
     parameter_set = [
@@ -299,16 +283,16 @@ def exercise_8e2(timestep,duration):
             drive=4,  # An example of parameter part of the grid search
             updown_coupling_weight = 0, 
             feedback_weight = wfb,
-            initial_phases = i_ph, 
+            #initial_phases = i_ph, 
             amplitude_gradient = None,  # Just an example
             phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
         ) 
-        for wfb in np.linspace(0,10,5)
+        for wfb in np.linspace(0,10,j)
     ]
 
 
-    velocities = np.zeros(5)
-    energies = np.zeros(5)
+    velocities = np.zeros(j)
+    energies = np.zeros(j)
 
         # Grid search
     directory = './logs/exercise8e2'
@@ -334,22 +318,22 @@ def exercise_8e2(timestep,duration):
         joints_velocities = data.sensors.joints.velocities_all()
         joints_torques = data.sensors.joints.motor_torques_all()
 
-        velocities[simulation_i] = compute_velocity(links_positions)
+        velocities[simulation_i] = compute_velocity(links_positions, timestep = timestep)
         energies[simulation_i] = compute_energy(joints_torques, joints_velocities)
 
     print(velocities)
     print(energies)
-    print(np.linspace(0,5,5))
-    '''
-    
-    
+    print(np.linspace(0,5,j))
+
 
 
     "PART 4: Model comparison: open and closed loop"
     #REMARK: slose loop achieves the same speed (if not better) but using much lower energy !"
     k = 16
-    i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
-    i_ph = np.concatenate((i_ph_h,np.zeros(4)))
+    #i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
+    #i_ph = np.concatenate((i_ph_h,np.zeros(4)))
+
+    '''
 
     parameter_set = [
     SimulationParameters(
@@ -360,7 +344,7 @@ def exercise_8e2(timestep,duration):
         drive=4,  # An example of parameter part of the grid search
         updown_coupling_weight = udcw, 
         feedback_weight = wfb,
-        initial_phases = i_ph, 
+        #initial_phases = i_ph, 
         amplitude_gradient = None,  # Just an example
         phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
     )
@@ -398,11 +382,13 @@ def exercise_8e2(timestep,duration):
         joints_velocities = data.sensors.joints.velocities_all()
         joints_torques = data.sensors.joints.motor_torques_all()
 
-        velocities[simulation_i] = compute_velocity(links_positions)
+        velocities[simulation_i] = compute_velocity(links_positions, timestep = timestep)
         energies[simulation_i] = compute_energy(joints_torques, joints_velocities)
         
     print(velocities)
     print(energies)
+
+    '''
 
 
 if __name__ == '__main__':

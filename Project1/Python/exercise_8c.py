@@ -6,53 +6,21 @@ import numpy as np
 from salamandra_simulation.simulation import simulation
 from simulation_parameters import SimulationParameters
 from plot_results import plot_2d
+from utils import compute_energy, compute_velocity, convert_nd_matrix_to_nd_plot_coordinates
 
-def compute_velocity(pos, start_time=-100, end_time=-1):
 
-    if end_time == -1:
-        end_time = pos.shape[0] - 1
-    if start_time < 0:
-        start_time = pos.shape[0] + start_time
-
-    pos_start = np.mean(pos[start_time], axis=0)
-    pos_end = np.mean(pos[end_time], axis=0)
-
-    distance = np.sqrt(np.sum(np.square(pos_end - pos_start)))
-    delta_time = end_time - start_time
-
-    return distance / delta_time
-
-def compute_energy(joint_torque, joint_velocities):
-    return np.sum(np.multiply(joint_torque, joint_velocities))
-
-def convert_nd_matrix_to_nd_plot_coordinates(m, x_vals=None, y_vals=None):
-
-    coordinates = np.zeros((np.prod(m.shape), len(m.shape) + 1))
-    for i, c in enumerate(np.ndindex(m.shape)):
-        if x_vals is not None:
-            coordinates[i, 0] = x_vals[c[0]]
-        else:
-            coordinates[i, 0] = c[0]
-        if len(c) > 1 and y_vals is not None:
-            coordinates[i, 1] = y_vals[c[1]]
-        elif len(c) > 1:
-            coordinates[i, 1] = c[1]
-        coordinates[i, len(m.shape)] = m[c]
-
-    return coordinates
 
 def exercise_8c(timestep):
     """Exercise 8c"""
 
     "Part 1"
 
-    '''
-
     # Grid search parameters
     n_vals = 6
     #amplitude_vals = np.linspace(0, 3.2, num=n_vals)  # with scaling
     #amplitude_vals = np.linspace(0, 5, num=n_vals)  # with scaling
     amplitude_vals = np.linspace(0, 1.5, num=n_vals)  # TODO: choose good values
+    print(amplitude_vals)
     #amplitude_vals = 2  # TODO: choose good values
 
     print(amplitude_vals)
@@ -65,6 +33,7 @@ def exercise_8c(timestep):
             spawn_position=[0, 0, 0.1],  # Robot position in [m]
             spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
             drive=3.5,  # ??? CHECK
+            #amplitude_gradient= [1.5,1.5] ,
             amplitude_gradient= [amplitude_1,amplitude_2] ,  # Just an example  # TODO: check if name of key is correct...
             #amplitude_gradient_scaling = True,
             phase_lag_body= ((2*np.pi)/8),  # TODO: check if this value makes sense, change if needed
@@ -88,8 +57,8 @@ def exercise_8c(timestep):
         sim, data = simulation(
             sim_parameters=sim_parameters,  # Simulation parameters, see above
             arena='water',  # Swimming
-            fast=True,  # For fast mode (not real-time)  # TODO: Set this to True if simulation takes too much time
-            headless=True,  # For headless mode (No GUI, could be faster)  # TODO: same
+            #fast=True,  # For fast mode (not real-time)  # TODO: Set this to True if simulation takes too much time
+            #headless=True,  # For headless mode (No GUI, could be faster)  # TODO: same
             # record=True,  # Record video
         )
         # Log robot data
@@ -105,7 +74,7 @@ def exercise_8c(timestep):
         amp_1 = simulation_i // n_vals
         amp_2 = simulation_i % n_vals 
 
-        velocities[amp_1, amp_2] = compute_velocity(start_time = 0, pos = links_positions)
+        velocities[amp_1, amp_2] = compute_velocity(start_time = 0, pos = links_positions, timestep = timestep)
         energies[amp_1, amp_2] = compute_energy(joints_torques, joints_velocities)
 
     coordinates_velocities = convert_nd_matrix_to_nd_plot_coordinates(velocities,x_vals = amplitude_vals, y_vals= amplitude_vals) 
@@ -113,10 +82,11 @@ def exercise_8c(timestep):
 
     plot_2d(coordinates_velocities, ("Amplitude head", "Amplitude tail", "Velocity"))
     plot_2d(coordinates_energy, ("Amplitude head", "Amplitude tail" , "Energy"))
-    '''
 
 
     "Part 2"
+
+    '''
 
 
     # Grid search parameters
@@ -167,6 +137,8 @@ def exercise_8c(timestep):
         # Log simulation parameters
         with open(filename.format(simulation_i, 'pickle'), 'wb') as param_file:
             pickle.dump(sim_parameters, param_file)
+
+    '''
 
 
 
