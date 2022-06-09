@@ -11,7 +11,7 @@ from simulation_parameters import SimulationParameters
 from network import SalamandraNetwork
 
 
-def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
+def run_network(duration, update=False, drive=2, R_head = 0,R_tail = 0):
     """Run network without MuJoCo and plot results
     Parameters
     ----------
@@ -26,7 +26,7 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
     # Simulation setup
     timestep = 1e-2
     times = np.arange(0, duration, timestep)
-    drivedt=(5/40)*times+0.5
+    drivedt=np.ones(len(times))*2#(5/40)*times+0.5
     n_iterations = len(times)
     sim_parameters = SimulationParameters(
         drive=drive,
@@ -96,7 +96,7 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
                     
                 )
             )
-        network.step(i, time0, timestep, loads = None)
+        network.step(i, time0, timestep,loads=np.zeros(12))
         phases_log[i+1, :] = network.state.phases(iteration=i+1)
         amplitudes_log[i+1, :] = network.state.amplitudes(iteration=i+1)
         x_outputs_log[i+1, :] = network.get_x_output(iteration=i+1)
@@ -121,7 +121,13 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
     #pylog.warning('Implement plots')
 
     #'''
-    #For coupled oscillators 
+    #For coupled oscillators
+
+    plt.figure(5)
+    plt.plot(outputs_log[:, -3],outputs_log[:, -2])
+    #plt.plot(outputs_log[:, -3],'k--')
+    plt.show()
+
 
     fig,ax=plt.subplots(4)
     ax[0].plot(times, x_outputs_log[:, 0]+1)
@@ -175,7 +181,7 @@ def run_network(duration, update=False, drive=0, R_head = 0,R_tail = 0):
 def main(plot):
     """Main"""
 
-    run_network(duration=40, update=True,drive=0.5, R_head= 1, R_tail=0.1)
+    run_network(duration=10, update=True,drive=0.5, R_head= 1, R_tail=0.1)
     # Show plots
     if plot:
         plt.show()
