@@ -13,6 +13,7 @@ class SimulationParameters:
         self.duration = 30
         self.initial_phases = None                #vector of size 20
         self.phase_lag_body = ((2*np.pi)/8)
+        self.phase_lag_limb2body = np.pi
         self.contra_coupling_weight=10
         self.updown_coupling_weight=10
         self.amplitude_gradient = None
