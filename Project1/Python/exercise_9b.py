@@ -31,7 +31,7 @@ def exercise_9b(timestep):
     #     record_path='walk2swim',  # or swim2walk
     # )
 
-    duration = 30  # Needs longer to see the full transition
+    duration = 10  # Needs longer to see the full transition
 
     # Parameters
     parameter_set = [
@@ -48,14 +48,8 @@ def exercise_9b(timestep):
             turn=0,  # Another example
             # ...
         )
-        for spawn_position, spawn_orientation, drive in zip([[0, 0, 0.1], [4, 0, 0]], [[0, 0, 0], [0, 0, np.pi]], [3, 3.5])
-        # for amplitudes in amplitude_vals
-        # for phase_lag in phase_lag_vals
+        for spawn_position, spawn_orientation, drive in zip([[0, 0, 0.1], [2, 0, 0]], [[0, 0, 0], [0, 0, np.pi]], [3, 3.5])
     ]
-
-    # velocities = np.zeros((amp_n_vals, phase_n_vals))
-    # energies = np.zeros((amp_n_vals, phase_n_vals))
-    # salamander_wavelength = np.zeros((amp_n_vals, phase_n_vals))
 
     # Grid search
     directory = './logs/exercise9b'
@@ -70,7 +64,7 @@ def exercise_9b(timestep):
             arena='amphibious',
             fast=True,  # For fast mode (not real-time)
             # headless=True,  # For headless mode (No GUI, could be faster)
-            #record=True,  # Record video
+            record=True,  # Record video
             record_path=record_path
         )
         # Log robot data
@@ -94,7 +88,7 @@ def exercise_9b(timestep):
         plt.xlabel('Time [ms]')
         plt.ylabel('Joint torques [rad]')
         plt.title('Joint torques over time')
-        plt.savefig('9b_Joint_torques')
+        plt.savefig('9b_Joint_torques.pdf')
         plt.show()
 
 
