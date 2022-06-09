@@ -94,8 +94,8 @@ class RobotParameters(dict):
             salamandra_data.sensors.links.urdf_positions()[iteration, :9],  # [x, y, z] coordinates per joint
         )
 
-        # We consider that the ground at locations x > land_water_x_boundary is water
-        land_water_x_boundary = 1.2
+        # We consider that the ground at locations z > land_water_z_boundary is land
+        land_water_z_boundary = -0.12
 
         # We consider that the salamander is on ground type g if its first n_relevant_joints are on this ground.
         n_relevant_joints = 5
@@ -104,8 +104,8 @@ class RobotParameters(dict):
         update_methods_list = [self.update]
 
         def find_ground_type():
-            relevant_joints = gps[:n_relevant_joints, 0]  # Only x position matters for x boundary
-            return np.all(relevant_joints < land_water_x_boundary)  # Returns True if on land, False otherwise
+            relevant_joints = gps[:n_relevant_joints, 2]  # Only z position matters for z boundary
+            return np.all(relevant_joints > land_water_z_boundary)  # Returns True if on land, False otherwise
 
         def update_drive_dependant_variables(new_drive, initial_parameters, update_methods_list):
             # Create parameter set to pass to functions
