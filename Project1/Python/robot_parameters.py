@@ -183,13 +183,13 @@ class RobotParameters(dict):
 
             #limb to body links
             if (0 <= i < 4):
-                    self.phase_bias[i,16] = np.pi
+                    self.phase_bias[i,16] = parameters.phase_lag_limb2body
             if (4 <= i < 8):
-                    self.phase_bias[i,18] = np.pi
+                    self.phase_bias[i,18] = parameters.phase_lag_limb2body
             if (8 <= i < 12):
-                    self.phase_bias[i,17] = np.pi
+                    self.phase_bias[i,17] = parameters.phase_lag_limb2body
             if (12 <= i < 16):
-                    self.phase_bias[i,19] = np.pi
+                    self.phase_bias[i,19] = parameters.phase_lag_limb2body
 
         return
 
