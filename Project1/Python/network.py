@@ -55,7 +55,7 @@ def motor_output(phases, amplitudes, iteration):
     Parameters
     ----------
     phases: <np.array>
-        Phases of the oscillator
+        Phases of the oscillator are given in radians !!
     amplitudes: <np.array>
         Amplitudes of the oscillator
 
