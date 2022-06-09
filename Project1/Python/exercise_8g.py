@@ -24,10 +24,10 @@ max_disruptions=9
 
 
 
-def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_weight=10, plot_column=None, set_seed=True):
+def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_weight=10, plot_column=None, set_seed=True, seed=42):
     """Exercise 8g"""
 
-    rng = np.random.default_rng(seed=42)
+    rng = np.random.default_rng(seed=seed)
 
     times = np.arange(0, duration, timestep)
 
@@ -83,14 +83,15 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
 
         links_positions = data.sensors.links.urdf_positions()
 
-        velocities[simulation_i] = compute_velocity(links_positions)
+        velocities[simulation_i] = compute_velocity(links_positions,timestep=timestep)
 
     velocities_reshaped = velocities[:-1 * repetitions].reshape(max_disruptions - 1, repetitions)
 
-    print(velocities_reshaped)
+    velocities_mean = np.mean(velocities_reshaped, axis=1)
+    velocities_std = np.std(velocities_reshaped, axis=1)
 
-    axes[1,plot_column].errorbar(np.arange(max_disruptions - 1), np.mean(velocities_reshaped, axis=1),
-                 yerr=np.std(velocities_reshaped, axis=1), fmt='-o')
+    axes[1,plot_column].errorbar(np.arange(max_disruptions - 1), velocities_mean / np.max(velocities_mean),
+                 yerr=velocities_std / velocities_mean[0], fmt='-o')
 
 
 
@@ -144,14 +145,15 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
 
         links_positions = data.sensors.links.urdf_positions()
 
-        velocities[simulation_i] = compute_velocity(links_positions)
+        velocities[simulation_i] = compute_velocity(links_positions,timestep=timestep)
 
     velocities_reshaped = velocities.reshape(max_disruptions, repetitions)
 
-    print(velocities_reshaped)
+    velocities_mean = np.mean(velocities_reshaped, axis=1)
+    velocities_std = np.std(velocities_reshaped, axis=1)
 
-    axes[2,plot_column].errorbar(np.arange(max_disruptions), np.mean(velocities_reshaped, axis=1),
-                 yerr=np.std(velocities_reshaped, axis=1), fmt='-o')
+    axes[2,plot_column].errorbar(np.arange(max_disruptions), velocities_mean / np.max(velocities_mean),
+                 yerr=velocities_std / velocities_mean[0], fmt='-o')
 
 
 
@@ -205,14 +207,15 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
 
         links_positions = data.sensors.links.urdf_positions()
 
-        velocities[simulation_i] = compute_velocity(links_positions)
+        velocities[simulation_i] = compute_velocity(links_positions,timestep=timestep)
 
     velocities_reshaped = velocities.reshape(max_disruptions, repetitions)
 
-    print(velocities_reshaped)
+    velocities_mean = np.mean(velocities_reshaped, axis=1)
+    velocities_std = np.std(velocities_reshaped, axis=1)
 
-    axes[0,plot_column].errorbar(np.arange(max_disruptions), np.mean(velocities_reshaped, axis=1),
-                 yerr=np.std(velocities_reshaped, axis=1), fmt='-o')
+    axes[0,plot_column].errorbar(np.arange(max_disruptions), velocities_mean / np.max(velocities_mean),
+                 yerr=velocities_std / velocities_mean[0], fmt='-o')
 
     ##############
     ## Mute mix ##
@@ -220,7 +223,7 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
 
     mixed_disruptions=np.zeros((max_disruptions-1,3))
     for i in range(max_disruptions-1):
-        mixed_disruptions[i, :] = num_pieces(i, 3,rng.integers(123456789))
+        mixed_disruptions[i, :] = num_pieces(i, 3,rng.integers(1234))
 
     mixed_disruptions = mixed_disruptions.astype(int)
 
@@ -272,51 +275,54 @@ def exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_w
 
         links_positions = data.sensors.links.urdf_positions()
 
-        velocities[simulation_i] = compute_velocity(links_positions)
+        velocities[simulation_i] = compute_velocity(links_positions,timestep=timestep)
 
     velocities_reshaped = velocities[:-1 * repetitions].reshape(max_disruptions - 1, repetitions)
 
-    print(velocities_reshaped)
+    velocities_mean = np.mean(velocities_reshaped, axis=1)
+    velocities_std = np.std(velocities_reshaped, axis=1)
 
-    axes[3,plot_column].errorbar(np.arange(max_disruptions - 1), np.mean(velocities_reshaped, axis=1),
-                 yerr=np.std(velocities_reshaped, axis=1), fmt='-o')
+    axes[3,plot_column].errorbar(np.arange(max_disruptions - 1), velocities_mean / np.max(velocities_mean),
+                 yerr=velocities_std / velocities_mean[0], fmt='-o')
 
 ##################
 ## Plot results ##
 ##################
 
-if __name__ == '__main__':
-    fig,axes=plt.subplots(4,3,sharex=True,sharey=True,figsize=(12,9))
+fig,axes=plt.subplots(4,3,sharex=True,sharey=True,figsize=(12,9))
 
-    # Define y and x labels
-    for i in range(4):
-        axes[i,0].set_ylabel('Speed [m/s]')
+# Define y and x labels
+for i in range(4):
+    axes[i,0].set_ylabel('Speed [1]')
+    axes[i,0].set_yticks([0,1])
     for j in range(3):
+        axes[i,j].set_ylim([-0.5, 1.5])
         axes[-1,j].set_xlabel('Number of neural disruptions')
 
-    # Define and assign row and column labels: https://stackoverflow.com/questions/25812255/row-and-column-headers-in-matplotlibs-subplots
-    cols = ['CPG only','Decoupled','Combined']
-    rows = ['Muted\nsensors','Removed\ncouplings','Muted\noscillators','Mixed\ndisruptions']
-    pad = 5 # in points
-    for ax, col in zip(axes[0], cols):
-        ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
-                    xycoords='axes fraction', textcoords='offset points',
-                    size='large', ha='center', va='baseline')
+# Define and assign row and column labels: https://stackoverflow.com/questions/25812255/row-and-column-headers-in-matplotlibs-subplots
+cols = ['CPG only','Decoupled','Combined']
+rows = ['Muted\nsensors','Removed\ncouplings','Muted\noscillators','Mixed\ndisruptions']
+pad = 5 # in points
+for ax, col in zip(axes[0], cols):
+    ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
+                xycoords='axes fraction', textcoords='offset points',
+                size='large', ha='center', va='baseline')
 
-    for ax, row in zip(axes[:,0], rows):
-        ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
-                    xycoords=ax.yaxis.label, textcoords='offset points',
-                    size='large', ha='right', va='center')
-    fig.tight_layout()
-    fig.subplots_adjust(left=0.15, top=0.95)
+for ax, row in zip(axes[:,0], rows):
+    ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
+                xycoords=ax.yaxis.label, textcoords='offset points',
+                size='large', ha='right', va='center')
+fig.tight_layout()
+fig.subplots_adjust(left=0.15, top=0.95)
 
+if __name__ == '__main__':
     # CPG only
-    exercise_8g(timestep=1e-2, duration=10, feedback_weight=0, updown_coupling_weight=10, plot_column=0)
+    exercise_8g(timestep=1e-2, duration=10, feedback_weight=0, updown_coupling_weight=10, plot_column=0,seed=42)
     # Decoupled
-    exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_weight=0, plot_column=1)
+    exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_weight=0, plot_column=1,seed=510)
     # Combined
-    exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_weight=10, plot_column=2)
+    exercise_8g(timestep=1e-2, duration=10, feedback_weight=2, updown_coupling_weight=10, plot_column=2,seed=666)
 
-    plt.show()
+plt.show()
 
-    plt.savefig('8g_disruptions.pdf', bbox_inches='tight')
+plt.savefig('8g_disruptions.pdf', bbox_inches='tight')

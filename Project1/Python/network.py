@@ -68,7 +68,17 @@ def motor_output(phases, amplitudes, iteration):
     # Implement equation here
     q = np.zeros(12)
     q[:8] = amplitudes[:8]*(1+np.cos(phases[:8])) - amplitudes[8:16]*(1+np.cos(phases[8:16]))
-    q[8:] = phases[16:]
+
+    # Walking implementation
+    limbs = np.floor(phases[16:]/np.pi)
+    cond=np.zeros(4)
+    offset=np.zeros(4)
+    cond[limbs % 2 == 1] = 1.2
+    cond[limbs % 2 == 0] = 0.8
+    offset[limbs % 2 == 1] = -0.2 *limbs[limbs % 2 == 1] *np.pi
+    offset[limbs % 2 == 0] = 0.2*limbs[limbs % 2 == 0] *np.pi+0.2*np.pi
+    q[8:] = phases[16:]*cond+offset
+
     return q
 
 
