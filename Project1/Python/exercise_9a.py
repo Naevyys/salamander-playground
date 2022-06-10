@@ -26,7 +26,7 @@ def exercise_9a(timestep):
             spawn_position=[0, 0, 0.1],  # Robot position in [m]
             spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
             drive=2,
-            amplitude_scaling=1.5,  # Just an example
+            #amplitude_scaling=1.5,  # Just an example
             amplitude_gradient=None,
             initial_phases=None,#np.concatenate((np.zeros(16), np.array([0, np.pi, np.pi, 0]))),  # or np.zeros(n_joints) for example
             #phase_lag_body=2*np.pi/16,
