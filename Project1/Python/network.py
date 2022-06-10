@@ -141,7 +141,13 @@ class SalamandraNetwork:
                 iteration=0,
                 value=sim_parameters.initial_phases,
             )
-        else: 
+        elif sim_parameters.initial_phases_rdn is not None:
+             self.state.set_phases(
+                iteration=0,
+                value=sim_parameters.initial_phases_rdn*np.random.ranf(self.robot_parameters.n_oscillators),
+            )
+
+        else:  
             self.state.set_phases(
                 iteration=0,
                 value=1e-4*np.random.ranf(self.robot_parameters.n_oscillators),

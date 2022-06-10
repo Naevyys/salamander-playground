@@ -5,9 +5,10 @@ import pickle
 import numpy as np
 from salamandra_simulation.simulation import simulation
 from simulation_parameters import SimulationParameters
-from plot_results import plot_trajectory, plot_positions
+from plot_results import plot_trajectory, plot_positions, plot_2d 
 import matplotlib.pyplot as plt
-from utils import compute_energy, compute_velocity
+from utils import compute_energy, compute_velocity, convert_nd_matrix_to_nd_plot_coordinates, plot_semilog_2d
+
 
 
 def exercise_8e1(timestep,duration):
@@ -63,62 +64,6 @@ def exercise_8e1(timestep,duration):
     print(compute_velocity(links_positions, timestep= timestep))
     print(compute_energy(joints_torques, joints_velocities))
 
-    '''Part 2: initial state'''
-
-    k = 16
-    i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
-    i_ph = np.concatenate((i_ph_h,np.zeros(4)))
-
-    times = np.arange(0, duration, timestep)
-
-    parameter_set = [
-        SimulationParameters(
-            duration=duration,  # Simulation duration in [s]
-            timestep=timestep,  # Simulation timestep in [s]
-            spawn_position=[0, 0, 0.1],  # Robot position in [m]
-            spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
-            drive=4,  # An example of parameter part of the grid search
-            updown_coupling_weight = 0, 
-            initial_phases = i_ph,
-            #amplitude_scaling = 2,
-            amplitude_gradient = None,  # Just an example
-            phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
-        )
-    ]
-
-    # Grid search
-    directory = './logs/exercise8e1'
-    os.makedirs(directory, exist_ok=True)
-    for f in os.listdir(directory):
-        os.remove(os.path.join(directory, f))  # Delete all existing files before running the new simulations
-    for simulation_i, sim_parameters in enumerate(parameter_set):
-        filename = './logs/exercise8e1/simulation_{}.{}'
-        sim, data = simulation(
-            sim_parameters=sim_parameters,  # Simulation parameters, see above
-            arena='water',  # Can also be 'ground', give it a try!
-            # fast=True,  # For fast mode (not real-time)
-            # headless=True,  # For headless mode (No GUI, could be faster)
-            # record=True,  # Record video
-        )
-        # Log robot data
-        data.to_file(filename.format(simulation_i, 'h5'), sim.iteration)
-        # Log simulation parameters
-        with open(filename.format(simulation_i, 'pickle'), 'wb') as param_file:
-            pickle.dump(sim_parameters, param_file)
-
-    links_positions = data.sensors.links.urdf_positions()
-    joints_velocities = data.sensors.joints.velocities_all()
-    joints_torques = data.sensors.joints.motor_torques_all()
-
-    head_positions = links_positions[:, 0, :]
-    tail_positions = links_positions[:, 7, :]
-
-    plot_trajectory(head_positions)
-    plot_positions(times, head_positions)
-    print(compute_velocity(links_positions, timestep= timestep))
-    print(compute_energy(joints_torques, joints_velocities))
-
-
 
 
 def exercise_8e2(timestep,duration):
@@ -126,8 +71,14 @@ def exercise_8e2(timestep,duration):
 
     times = np.arange(0, duration, timestep)
 
-    "PART 1: Model with hydrodynamic forces"
     '''
+
+    "PART 1: Model with hydrodynamic forces" 
+
+    i_ph_h = np.array([(16-n)*(2*np.pi)/16 for n in np.arange(16)])
+    i_ph = np.concatenate((i_ph_h,np.zeros(4)))
+
+
     parameter_set = [
         SimulationParameters(
             duration=duration,  # Simulation duration in [s]
@@ -137,6 +88,8 @@ def exercise_8e2(timestep,duration):
             drive=4,  # An example of parameter part of the grid search
             updown_coupling_weight = 0, 
             #amplitude_scaling = 2,
+            initial_phases = i_ph,
+            #initial_phases_rdn = 0.6,
             feedback_weight = 2, 
             amplitude_gradient = None,  # Just an example
             phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
@@ -174,125 +127,44 @@ def exercise_8e2(timestep,duration):
     plot_positions(times, head_positions)
     print(compute_velocity(links_positions, timestep = timestep))
     print(compute_energy(joints_torques, joints_velocities))
-    '''
-
-    "PART 3: Model with correct initial phases + changing wbf"
-
-    #i_ph_h = np.array([(2*np.pi)/8, (2*np.pi)*2/8, (2*np.pi)*3/8, (2*np.pi)*4/8, (2*np.pi)*5/8, (2*np.pi)*6/8, (2*np.pi)*7/8, 0 ])
-    #i_ph = np.concatenate((i_ph_h,i_ph_h,np.zeros(4)))
-
-    #i_ph_h = np.array([(16-n)*(2*np.pi)/16 for n in np.arange(16)])
-    #i_ph = np.concatenate((i_ph_h,np.zeros(4)))
-
-    #i_ph_h = ((2*np.pi)/8)*np.ones(16)
-    #i_ph = np.concatenate((i_ph_h,np.zeros(4)))
-
-    #i_ph_h = ((2*np.pi)/8)*np.ones(8)
-    #i_ph = np.concatenate((i_ph_h,2*i_ph_h,np.zeros(4)))
-
-    #i_ph = np.array([(20-n)*(2*np.pi)/20 for n in np.arange(20)])
-
-    #i_ph_h = ((2*np.pi)/16)*np.ones(8)
-    #i_ph = np.concatenate((i_ph_h,8*i_ph_h,np.zeros(4)))
-
-    #i_ph = np.array([(20-n)*(2*np.pi)/20 for n in np.arange(20)])
-
-    #k = 16
-    #i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
-    #i_ph = np.concatenate((i_ph_h,np.zeros(4)))
-
-    '''
-    Remarks so far: 
-    - when random initialisation of init_phases even with very small amplitude --> see it moving, but only a little (like spped is slow 1 direction is random)
-    - when use a phase gradient but the init_phase are identical modulo 8, doesn't work ! 
-    - when use a phase gradient over the 16 oscillator works fast ! but turn a littlebit
-    - when use a cst value over the 16 oscillators, doesn't work ! 
-    - when use a cts value over 8 and then change for the other 8, swims but in aweird way + slowly
-    - when use a phase gradient over the 20 oscillator works fast ! not as fast as the 16 (i.e. phase difference btw consecutive are smaller)
-    - when use a cts value over 8 and then change for the other 8, for bigger phase difference in adj joint swims but in aweird way + slowly
-    - pour le gradient, plus on augmente la difference de phase (i.e plus on reduit le denominateur, plus elle va vite)
-
-    PROBLEM, IN FORUM IS SAID: the initialization of the phases should not affect the capability of the model to produce movement in general
-    PROBLEM; THE change in weighth doesn't seem to change anything, just energy, no effect on speed ! so even with 0 feedback weights... ! 
-    '''
-    '''
-    parameter_set = [
-        SimulationParameters(
-            duration=duration,  # Simulation duration in [s]
-            timestep=timestep,  # Simulation timestep in [s]
-            spawn_position=[0, 0, 0.1],  # Robot position in [m]
-            spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
-            drive=4,  # An example of parameter part of the grid search
-            updown_coupling_weight = 0, 
-            feedback_weight = 2,
-            initial_phases = i_ph, 
-            amplitude_gradient = None,  # Just an example
-            phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
-        ) 
-    ]
-
-
-        # Grid search
-    directory = './logs/exercise8e2'
-    os.makedirs(directory, exist_ok=True)
-    for f in os.listdir(directory):
-        os.remove(os.path.join(directory, f))  # Delete all existing files before running the new simulations
-    for simulation_i, sim_parameters in enumerate(parameter_set):
-        filename = './logs/exercise8e2/simulation_{}.{}'
-        sim, data = simulation(
-            sim_parameters=sim_parameters,  # Simulation parameters, see above
-            arena='water',  # Can also be 'ground', give it a try!
-            #fast=True,  # For fast mode (not real-time)
-            #headless=True,  # For headless mode (No GUI, could be faster)
-            # record=True,  # Record video
-        )
-        # Log robot data
-        data.to_file(filename.format(simulation_i, 'h5'), sim.iteration)
-        # Log simulation parameters
-        with open(filename.format(simulation_i, 'pickle'), 'wb') as param_file:
-            pickle.dump(sim_parameters, param_file)
-
-    links_positions = data.sensors.links.urdf_positions()
-    joints_velocities = data.sensors.joints.velocities_all()
-    joints_torques = data.sensors.joints.motor_torques_all()
-
-    head_positions = links_positions[:, 0, :]
-    tail_positions = links_positions[:, 7, :]
-
-    plot_trajectory(head_positions)
-    plot_positions(times, head_positions)
-    print(compute_velocity(links_positions, timestep = timestep))
-    print(compute_energy(joints_torques, joints_velocities))
 
     '''
 
 
     "PART 3: Model with correct initial phases + changing wbf"
-    #k = 16
-    #i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
-    #i_ph = np.concatenate((i_ph_h,np.zeros(4)))
+    
     j = 10
-
+    i = 7
+    #i_ph_vec = [1,2,3,4,5,6,7]
+    #i_ph_vec = [0.5*1e-4,1e-3, 0.5*1e-3, 1e-2, 0.5*1e-2, 0.1, 0.5]
+    #i_ph_vec = np.linspace(0.1,1,7)
+    i_ph_vec = np.linspace(0.1,2*np.pi,i)
+    w_fb = np.linspace(0,3,j)
+    print(i_ph_vec)
+  
     
     parameter_set = [
         SimulationParameters(
-            duration=duration,  # Simulation duration in [s]
+            duration=20, # Simulation duration in [s]
             timestep=timestep,  # Simulation timestep in [s]
             spawn_position=[0, 0, 0.1],  # Robot position in [m]
             spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
             drive=4,  # An example of parameter part of the grid search
             updown_coupling_weight = 0, 
             feedback_weight = wfb,
-            #initial_phases = i_ph, 
+            #feedback_weight = 2,
+            initial_phases_rnd = i_ph, 
             amplitude_gradient = None,  # Just an example
             phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
-        ) 
-        for wfb in np.linspace(0,10,j)
+        )
+        for wfb in w_fb
+        #for i_ph in 0.6*np.ones(i)
+        for i_ph in i_ph_vec
     ]
 
 
-    velocities = np.zeros(j)
-    energies = np.zeros(j)
+    velocities = np.zeros((j,i))
+    energies = np.zeros((j,i))
 
         # Grid search
     directory = './logs/exercise8e2'
@@ -318,14 +190,21 @@ def exercise_8e2(timestep,duration):
         joints_velocities = data.sensors.joints.velocities_all()
         joints_torques = data.sensors.joints.motor_torques_all()
 
-        velocities[simulation_i] = compute_velocity(links_positions, timestep = timestep)
-        energies[simulation_i] = compute_energy(joints_torques, joints_velocities)
+        amp_1 = simulation_i // i
+        amp_2 = simulation_i % i 
 
-    print(velocities)
-    print(energies)
-    print(np.linspace(0,5,j))
+        velocities[amp_1, amp_2] = compute_velocity(start_time = 0, pos = links_positions, timestep = timestep)
+        energies[amp_1, amp_2] = compute_energy(joints_torques, joints_velocities)
 
+    coordinates_velocities = convert_nd_matrix_to_nd_plot_coordinates(velocities,x_vals = w_fb, y_vals= i_ph_vec) 
+    coordinates_energy = convert_nd_matrix_to_nd_plot_coordinates(energies,x_vals = w_fb, y_vals= i_ph_vec)
+ 
+    plot_2d(coordinates_velocities, ("Feedback weight","Amplitude of random initial phases", "Velocity"))
+    plot_2d(coordinates_energy, ("Feedback weight","Amplitude of random initial phases", "Energy"))
 
+    
+
+    '''
 
     "PART 4: Model comparison: open and closed loop"
     #REMARK: slose loop achieves the same speed (if not better) but using much lower energy !"
@@ -333,7 +212,6 @@ def exercise_8e2(timestep,duration):
     #i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
     #i_ph = np.concatenate((i_ph_h,np.zeros(4)))
 
-    '''
 
     parameter_set = [
     SimulationParameters(

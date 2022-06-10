@@ -6,6 +6,7 @@ import numpy as np
 from salamandra_simulation.simulation import simulation
 from simulation_parameters import SimulationParameters
 from plot_results import plot_2d
+from plot_results import plot_trajectory, plot_positions
 from utils import compute_energy, compute_velocity, convert_nd_matrix_to_nd_plot_coordinates
 
 
@@ -23,7 +24,7 @@ def exercise_8c(timestep):
     print(amplitude_vals)
     #amplitude_vals = 2  # TODO: choose good values
 
-    print(amplitude_vals)
+    #print(amplitude_vals)
 
     # Parameters
     parameter_set = [
@@ -33,7 +34,7 @@ def exercise_8c(timestep):
             spawn_position=[0, 0, 0.1],  # Robot position in [m]
             spawn_orientation=[0, 0, 0],  # Orientation in Euler angles [rad]
             drive=3.5,  # ??? CHECK
-            #amplitude_gradient= [1.5,1.5] ,
+            #amplitude_gradient= [0,1.5] ,
             amplitude_gradient= [amplitude_1,amplitude_2] ,  # Just an example  # TODO: check if name of key is correct...
             #amplitude_gradient_scaling = True,
             phase_lag_body= ((2*np.pi)/8),  # TODO: check if this value makes sense, change if needed
@@ -57,8 +58,8 @@ def exercise_8c(timestep):
         sim, data = simulation(
             sim_parameters=sim_parameters,  # Simulation parameters, see above
             arena='water',  # Swimming
-            #fast=True,  # For fast mode (not real-time)  # TODO: Set this to True if simulation takes too much time
-            #headless=True,  # For headless mode (No GUI, could be faster)  # TODO: same
+            fast=True,  # For fast mode (not real-time)  # TODO: Set this to True if simulation takes too much time
+            headless=True,  # For headless mode (No GUI, could be faster)  # TODO: same
             # record=True,  # Record video
         )
         # Log robot data
@@ -71,6 +72,9 @@ def exercise_8c(timestep):
         joints_velocities = data.sensors.joints.velocities_all()
         joints_torques = data.sensors.joints.motor_torques_all()
 
+        head_positions = links_positions[:, 0, :]
+        tail_positions = links_positions[:, 7, :]
+
         amp_1 = simulation_i // n_vals
         amp_2 = simulation_i % n_vals 
 
@@ -79,12 +83,13 @@ def exercise_8c(timestep):
 
     coordinates_velocities = convert_nd_matrix_to_nd_plot_coordinates(velocities,x_vals = amplitude_vals, y_vals= amplitude_vals) 
     coordinates_energy = convert_nd_matrix_to_nd_plot_coordinates(energies,x_vals = amplitude_vals, y_vals= amplitude_vals) 
-
+ 
     plot_2d(coordinates_velocities, ("Amplitude head", "Amplitude tail", "Velocity"))
     plot_2d(coordinates_energy, ("Amplitude head", "Amplitude tail" , "Energy"))
 
 
-    "Part 2"
+
+    "Part 2: Using ampltitude gradient scaling"
 
     '''
 

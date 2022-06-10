@@ -1,4 +1,8 @@
 import numpy as np
+from salamandra_simulation.parse_args import save_plots
+from salamandra_simulation.save_figures import save_figures
+from scipy.interpolate import griddata
+import matplotlib.pyplot as plt
 
 
 def compute_velocity(pos, timestep=1e-2, start_time=-100, end_time=-1):
@@ -43,3 +47,53 @@ def compute_salamander_wavelength(head_pos, tail_pos, start_time=400, end_time=-
     head_pos = np.array(head_pos)
     tail_pos = np.array(tail_pos)
     return np.mean(np.sqrt(np.sum(np.square(head_pos[start_time:end_time] - tail_pos[start_time:end_time]), axis=1)))
+
+
+def plot_semilog_2d(results, labels, n_data=300, cmap=None, plot=True):
+        """Plot result
+
+        results - The results are given as a 2d array of dimensions [N, 3].
+
+        labels - The labels should be a list of three string for the xlabel, the
+        ylabel and zlabel (in that order).
+
+        n_data - Represents the number of points used along x and y to draw the plot
+
+        log - Set log to True for logarithmic scale.
+
+        cmap - You can set the color palette with cmap. For example,
+        set cmap='nipy_spectral' for high constrast results.
+
+        """
+        xnew = np.linspace(min(results[:, 0]), max(results[:, 0]), n_data)
+        ynew = np.linspace(min(results[:, 1]), max(results[:, 1]), n_data)
+        grid_x, grid_y = np.meshgrid(xnew, ynew)
+        results_interp = griddata(
+            (results[:, 0], results[:, 1]), results[:, 2],
+            (grid_x, grid_y),
+            method='linear',  # nearest, cubic
+        )
+        extent = (
+            min(xnew), max(xnew),
+            min(ynew), max(ynew)
+        )
+        plt.semilogy(results[:, 0], results[:, 1], 'r.')
+        imgplot = plt.imshow(
+            results_interp,
+            extent=extent,
+            aspect='auto',
+            origin='lower',
+            interpolation='none',
+        )
+        if cmap is not None:
+            imgplot.set_cmap(cmap)
+        plt.xlabel(labels[0])
+        plt.ylabel(labels[1])
+        cbar = plt.colorbar()
+        cbar.set_label(labels[2])
+
+        # Show plots
+        if plot:
+            plt.show()
+        else:
+            save_figures()

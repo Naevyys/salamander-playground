@@ -12,6 +12,7 @@ class SimulationParameters:
         self.n_legs_joints = 4
         self.duration = 30
         self.initial_phases = None                #vector of size 20
+        self.initial_phases_rdn = None            #scalar
         self.phase_lag_body = ((2*np.pi)/8)
         self.contra_coupling_weight=10
         self.updown_coupling_weight=10

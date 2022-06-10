@@ -108,6 +108,8 @@ def plot_2d(results, labels, n_data=300, log=False, cmap=None, plot=True):
         save_figures()
 
 
+
+
 def main(directory='logs/example', sim_number='0', suffix="", plot=True):
     """Main"""
     # Load data
