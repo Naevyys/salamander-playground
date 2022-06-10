@@ -29,6 +29,9 @@ class RobotParameters(dict):
         self.rates = np.zeros(self.n_oscillators)
         self.nominal_amplitudes = np.zeros(self.n_oscillators)
 
+        # Save initial parameters if needed
+        self.parameters = parameters
+
         self.muted_sensors = np.ones(self.n_oscillators)
         self.muted_couplings = np.ones([self.n_oscillators, self.n_oscillators])
         self.muted_oscillators = np.ones(self.n_oscillators)
@@ -54,6 +57,7 @@ class RobotParameters(dict):
         self.muted_oscillators[affected_oscillators] = 0
 
         self.feedback_weight = parameters.feedback_weight*self.muted_sensors
+        self.ground_type = None
 
         #self.phase_lag_body = parameters.phase_lag_body
         #self.amplitude_scaling = parameters.amplitude_scaling
@@ -87,8 +91,45 @@ class RobotParameters(dict):
 
         """
         gps = np.array(
-            salamandra_data.sensors.links.urdf_positions()[iteration, :9],
+            salamandra_data.sensors.links.urdf_positions()[iteration, :9],  # [x, y, z] coordinates per joint
         )
+
+        # We consider that the ground at locations z > land_water_z_boundary is land
+        land_water_z_boundary = -0.12
+
+        # We consider that the salamander is on ground type g if its first n_relevant_joints are on this ground.
+        n_relevant_joints = 5
+
+        # Methods we need to call to update drive dependant variables
+        update_methods_list = [self.update]
+
+        def find_ground_type():
+            relevant_joints = gps[:n_relevant_joints, 2]  # Only z position matters for z boundary
+            return np.all(relevant_joints > land_water_z_boundary)  # Returns True if on land, False otherwise
+
+        def update_drive_dependant_variables(new_drive, initial_parameters, update_methods_list):
+            # Create parameter set to pass to functions
+            drive_mlr = np.ones(2*self.n_body_joints + self.n_legs_joints) * new_drive
+            initial_parameters.drive_mlr = drive_mlr  # Update drive value in parameters
+
+            for m in update_methods_list:  # Update the parameters
+                m(initial_parameters)
+
+        if self.ground_type is None:
+            self.ground_type = find_ground_type()
+
+        prev_ground_type = self.ground_type  # Save previous ground type
+        self.ground_type = find_ground_type()  # Set new ground type
+
+        if prev_ground_type > self.ground_type:
+            # Land -> water
+            new_drive = 3.5
+            update_drive_dependant_variables(new_drive, self.parameters, update_methods_list)
+        elif prev_ground_type < self.ground_type:
+            # Water -> land
+            new_drive = 3
+            update_drive_dependant_variables(new_drive, self.parameters, update_methods_list)
+        # Else do nothing
 
     def set_frequencies(self, parameters):
         """Set frequencies"""
@@ -183,13 +224,13 @@ class RobotParameters(dict):
 
             #limb to body links
             if (0 <= i < 4):
-                    self.phase_bias[i,16] = np.pi
+                    self.phase_bias[i,16] = parameters.phase_lag_limb2body
             if (4 <= i < 8):
-                    self.phase_bias[i,18] = np.pi
+                    self.phase_bias[i,18] = parameters.phase_lag_limb2body
             if (8 <= i < 12):
-                    self.phase_bias[i,17] = np.pi
+                    self.phase_bias[i,17] = parameters.phase_lag_limb2body
             if (12 <= i < 16):
-                    self.phase_bias[i,19] = np.pi
+                    self.phase_bias[i,19] = parameters.phase_lag_limb2body
 
         return
 

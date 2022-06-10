@@ -41,7 +41,7 @@ def plot_trajectory(link_data, plot = True):
         save_figures()
 
 
-def plot_1d(results, labels):
+def plot_1d(results, labels, plot=True):
     """Plot result
 
     results - The results are given as a 2d array of dimensions [N, 2].
@@ -55,6 +55,12 @@ def plot_1d(results, labels):
     plt.xlabel(labels[0])
     plt.ylabel(labels[1])
     plt.grid(True)
+
+    # Show plots
+    if plot:
+        plt.show()
+    else:
+        save_figures()
 
 
 def plot_2d(results, labels, n_data=300, log=False, cmap=None, plot=True):
