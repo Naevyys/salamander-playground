@@ -129,6 +129,7 @@ def exercise_8e2(timestep,duration):
     print(compute_energy(joints_torques, joints_velocities))
 
     '''
+    '''
 
 
     "PART 3: Model with correct initial phases + changing wbf"
@@ -208,9 +209,10 @@ def exercise_8e2(timestep,duration):
 
     "PART 4: Model comparison: open and closed loop"
     #REMARK: slose loop achieves the same speed (if not better) but using much lower energy !"
-    k = 16
+    #k = 16
     #i_ph_h = np.linspace((16*2*np.pi)/k,(2*np.pi)/k,16)
     #i_ph = np.concatenate((i_ph_h,np.zeros(4)))
+    iph = [1,2,3,4,5,6,7]
 
 
     parameter_set = [
@@ -222,18 +224,21 @@ def exercise_8e2(timestep,duration):
         drive=4,  # An example of parameter part of the grid search
         updown_coupling_weight = udcw, 
         feedback_weight = wfb,
+        initial_phases_rdn = 0.6,
         #initial_phases = i_ph, 
         amplitude_gradient = None,  # Just an example
         phase_lag_body=((2 * np.pi) / 8),  # or np.zeros(n_joints) for example
     )
 
-    for udcw, wfb in zip(np.array([10,10,0]),np.array([0,2,2]))
+    for udcw, wfb in zip(np.array([10,0]),np.array([0,2]))
+    for i in iph
     #initial phases ??? changes from closed to open ?
     ]
 
 
-    velocities = np.zeros(3)
-    energies = np.zeros(3)
+    velocities = np.zeros((2,7))
+    energies = np.zeros((2,7))
+
 
 
         # Grid search
@@ -260,15 +265,24 @@ def exercise_8e2(timestep,duration):
         joints_velocities = data.sensors.joints.velocities_all()
         joints_torques = data.sensors.joints.motor_torques_all()
 
-        velocities[simulation_i] = compute_velocity(links_positions, timestep = timestep)
-        energies[simulation_i] = compute_energy(joints_torques, joints_velocities)
-        
-    print(velocities)
-    print(energies)
+        amp_1 = simulation_i // 7
+        amp_2 = simulation_i % 7 
 
-    '''
+        velocities[amp_1,amp_2] = compute_velocity(links_positions, timestep = timestep)
+        energies[amp_1,amp_2] = compute_energy(joints_torques, joints_velocities)
+
+    coordinates_velocities = convert_nd_matrix_to_nd_plot_coordinates(velocities,x_vals =np.array([1,2]), y_vals= iph) 
+    coordinates_energy = convert_nd_matrix_to_nd_plot_coordinates(energies,x_vals = np.array([1,2]), y_vals= iph)
+ 
+    plot_2d(coordinates_velocities, ("Simulation mode","Simulation number", "Velocity"))
+    plot_2d(coordinates_energy, ("Simulation mode","Simulation number", "Energy"))
+        
+    #print(velocities)
+    #print(energies)
+
+    
 
 
 if __name__ == '__main__':
-    #exercise_8e1(timestep=1e-2,duration=10)
+    exercise_8e1(timestep=1e-2,duration=10)
     exercise_8e2(timestep=1e-2,duration=10)
